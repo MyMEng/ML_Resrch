@@ -1,0 +1,90 @@
+\documentclass[12pt, a4paper, pdflatex]{report}
+%  notitlepage - abstract on the same page
+\usepackage{indentfirst} % indent frst paragraph of section
+\usepackage{fullpage} % full A4 page
+\usepackage{amsmath}
+\usepackage[pdftex]{graphicx}
+\usepackage{cite} % BiTeX
+\usepackage{lipsum}
+\newcommand{\ts}{\textsuperscript}
+\usepackage[usenames,dvipsnames]{color}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+% Upper part of the page. The '~' is needed because \\
+% only works if a paragraph has started.
+\includegraphics[width=0.5\textwidth]{graphics/UOB-logo.png}~\\[4cm] % was 1cm
+
+% \textsc{\LARGE University of Bristol}\\[1.5cm]
+
+%\textsc{\Large Final year project}\\[0.5cm]
+
+% Title
+\HRule \\[0.4cm]
+{ \huge \bfseries \emph{Semi-supervised} learning problem.\\
+	Comprehensive introduction to the \colorbox{magenta}{problem} for everyone with real life application. \\[0.4cm] }
+\HRule \\[1.5cm]
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Authors:}\\
+Kacper \textsc{\textbf{Sokol}} \\
+Maciej \textsc{\textbf{Kumorek}}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+Peter \textsc{\textbf{Flach}}
+\end{flushright}
+\end{minipage}
+
+\vfill
+
+% Bottom of the page
+{\large \today}
+\end{center}
+\end{titlepage}
+
+\begin{abstract}
+This dissertation consists of two chapters. First one is a general introduction to theory underlying...
+\begin{center}
+Keywords: \textbf{semi-supervised, learning...}
+\end{center}
+\end{abstract}
+
+
+\newpage
+\tableofcontents
+\newpage
+
+\chapter{Theory behind...}
+
+
+\section{Background}
+
+
+\section{Applications}
+ 
+\section{Terminology}
+
+
+\section{General assumptions}
+
+
+
+
+\chapter{Practical application}
+
+\newpage
+\begin{center} \textbf{\huge \vspace{15pt} FIN} \end{center}
+
+\bibliography{ref}{}
+\bibliographystyle{plain}
+
+\end{document}
