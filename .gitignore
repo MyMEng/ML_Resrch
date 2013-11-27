@@ -34,3 +34,6 @@
 *.tex_bak
 *.pdf
 
+# Python
+experiment/emotions.arff
+experiment/emotions_ID.arff
