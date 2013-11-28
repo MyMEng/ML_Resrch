@@ -15,6 +15,7 @@ weka = "java -cp weka.jar "
 removeFilter1 = "weka.filters.unsupervised.attribute.Remove -R "
 removeFilter2 = " -i "
 removeFilter3 = " -o "
+addIDfilter = "weka.filters.unsupervised.attribute.AddID -i "
 #	J48
 classAsignA = "weka.classifiers.trees.J48 -C 0.25 -M 2 -p 1 -s "
 classAsignB = " -t "
@@ -69,13 +70,27 @@ def countLabels(labels) :
 #
 #
 def labelData(fileName):
-	clas = subprocess.Popen(
-		"java -cp weka.jar weka.filters.unsupervised.attribute.AddID -i " +
-		fileName + " -o " + fileName[0:-5] + "_ID.arff",
-		stdout=subprocess.PIPE, shell=True )
+	clas = subprocess.Popen( weka + addIDfilter + fileName + " -o " +
+		fileName[0:-5] + "_ID.arff",	stdout=subprocess.PIPE, shell=True )
 	(out, err) = clas.communicate()
 	if err!=None:
 		print "Error while appending ID:\n" + err
+		exit()
+#
+#
+#
+################################################################################
+################################################################################
+# remove ground truth for labels
+#
+#
+def unlabelData(fileName, IDrange):
+	clas = subprocess.Popen( weka + removeFilter1 + IDrange + removeFilter2 +
+		fileName + removeFilter3 + fileName[0:-5] + "_unlabeled.arff",
+		stdout=subprocess.PIPE, shell=True )
+	(out, err) = clas.communicate()
+	if err!=None:
+		print "Error while removing labels:\n" + err
 		exit()
 #
 #
@@ -107,6 +122,27 @@ def handleInstances(dataList):
 			instances.append(line)
 
 	return (counter, header, instances)
+#
+#
+#
+################################################################################
+################################################################################
+# count number of attributes present in the data set
+#
+#
+def countAtributes( data ) :
+	count = 0
+
+	# if it's empty return error
+	if not data :
+		print "Error encountered. Data file empty!"
+		exit()
+	# count commas what corresponds to attributes
+	for i in data[0] :
+		if i == ',' :
+			count += 1
+
+	return count
 #
 #
 #
@@ -250,8 +286,6 @@ while not noLabelsUsr :
 		print 'Invalid Number. For YES write \'y\' and confirm with \'return\'.'
 		noLabelsUsr = None
 
-print noLabels
-
 #	put ID as a first element of data
 labelData(argumentList[1])
 
@@ -259,20 +293,27 @@ labelData(argumentList[1])
 rawFile = open(argumentList[1][0:-5] + "_ID.arff", 'r')
 fileList = list(rawFile)
 
-#	count the number
-(no, arffHeader, data) = handleInstances(fileList)
+#	count the number of instances and get data list and header list
+(noInstances, arffHeader, data) = handleInstances(fileList)
+
+#	count number of attributes
+noAtributes = countAtributes(data)
+
+#	remove the ground truth for labels
+IDrangeRm = ( str(noAtributes-noLabels+1) + "-" + str(noAtributes) )
+unlabelData(argumentList[1], IDrangeRm)
 
 #	ask how many to use for supervised learning
 sup = None
 while not sup :
 	try:
-		sup = int( raw_input( "How many out of " + str(no) + " instances do you want to use for " +
+		sup = int( raw_input( "How many out of " + str(noInstances) + " instances do you want to use for " +
 			"supervised learning?: " ) )
 	except ValueError:
 		print 'Invalid Number'
 
 #	Give a list of indexes to use for supervised learning
-supIndexes = supIndex( sup, no )
+supIndexes = supIndex( sup, noInstances )
 
 #	extract supIndexes and write to arff file
 #	write set_training.arff and set_test.arff
@@ -283,7 +324,8 @@ supIndexes = supIndex( sup, no )
 rmLabels = True
 saveToarff(arffHeader, Training, Test, rmLabels)
 
-#	train classifiers with mentioned schemes and write them to files
+#	train classifiers on initial train set with mentioned schemes and write them
+#	to files
 trainClassifier()
 
 #	ask for numbers of samples to to add and boost classifier
