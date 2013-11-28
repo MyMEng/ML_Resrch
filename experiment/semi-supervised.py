@@ -12,6 +12,9 @@ from random import randint
 
 # global variables
 weka = "java -cp weka.jar "
+removeFilter1 = "weka.filters.unsupervised.attribute.Remove -R "
+removeFilter2 = " -i "
+removeFilter3 = " -o "
 #	J48
 classAsignA = "weka.classifiers.trees.J48 -C 0.25 -M 2 -p 1 -s "
 classAsignB = " -t "
@@ -45,6 +48,22 @@ classifierB = ( " -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A " +
 
 
 # functions
+################################################################################
+# count number of labels to predict
+#
+#
+def countLabels(labels) :
+	counter = 0
+
+	for i in labels :
+		if "<label name=\"" in i and "\"></label>" in i :
+			counter += 1
+
+	return counter
+#
+#
+#
+################################################################################
 ################################################################################
 # give # to all data instances to be able to distinguish them later on
 #
@@ -98,7 +117,8 @@ def handleInstances(dataList):
 #
 def supIndex(noToExtract, noInstances) :
 	if noToExtract > noInstances :
-		print "You are extracting more elements that there is instances."
+		print( "You are extracting more elements that there is instances." +
+			str(noToExtract) + " out of " + str(noInstances) + "!" )
 		exit()
 
 	remove = []
@@ -123,6 +143,77 @@ def supIndex(noToExtract, noInstances) :
 #
 #
 ################################################################################
+################################################################################
+# generate 2 lists: one containing training(labeled) instances and the other
+# unlabeled instances to improve a classifier
+#
+def createTT(removeInd, instances) :
+	rm = removeInd[:]
+	test = []
+	training = []
+
+	for ind, val in enumerate(instances):
+		# instance with ground-truth
+		if ind in rm :
+			# append element to training
+			training.append(val)
+			# remove ind element
+			rm.remove(ind)
+			continue
+		test.append(val)
+
+	if not rm :
+		print "All elements appended."
+
+	return (training, test)
+#
+#
+#
+################################################################################
+################################################################################
+# create arff files with selected instances
+#
+#
+def saveToarff(arffHeader, Training, Test, removeLabels) :
+	# open two files to write
+	testStream = open( argumentList[1][0:-5]+"_unlabeledTest.arff", 'w')
+	trainingStream = open( argumentList[1][0:-5]+"_labeledTraining.arff", 'w')
+
+	# save header info to streams
+	for i in arffHeader :
+		testStream.write(i)
+		trainingStream.write(i)
+
+	# save training info to streams
+	for i in Training :
+		trainingStream.write(i)
+
+	# save test info to stream
+	if removeLabels :
+		for i in Test :
+			j = i[0:-5]
+			testStream.write(j)
+	else :
+		for i in Test :
+			testStream.write(i)
+#
+#
+#
+################################################################################
+################################################################################
+# train selected classifiers with newly created arff files
+#
+#
+def trainClassifier() :
+	arffHeader = []
+	Training = []
+	Test = []
+
+	return (arffHeader, Training, Test)
+#
+#
+#
+################################################################################
 
 
 # main program
@@ -130,11 +221,36 @@ def supIndex(noToExtract, noInstances) :
 argumentList = list(sys.argv)
 
 #	check correct number of arguments
-if len(argumentList)!=2:
-	print ( "There should be 1 argument given:" + "\n" +
-		"	-*- filename in 'arff' format" )
+if len(argumentList)!=3:
+	print ( "There should be 2 arguments given:" + "\n" +
+		"	-*- data set in 'arff' format" + "\n"
+		"	-*- file containing labels in 'xml' format" )
 		# + "\n" + "	-*- number of iterations" )
 	exit()
+
+#	open labels data
+rawLabels = open(argumentList[2], 'r')
+labels = list(rawLabels)
+#	...and count them
+noLabels = countLabels(labels)
+#	check whether counting is correct
+print( str(noLabels) + " labels have(has) been found. Is it Correct?" )
+noLabelsUsr = None
+while not noLabelsUsr :
+	try:
+		noLabelsUsr = raw_input( "To confirm type 'y' or if the number is " +
+			"incorrect please give true number of labels: " )
+		# if user put 'y' continue
+		if noLabelsUsr == 'y' :
+			continue
+
+		noLabels = int(noLabelsUsr)
+
+	except ValueError:
+		print 'Invalid Number. For YES write \'y\' and confirm with \'return\'.'
+		noLabelsUsr = None
+
+print noLabels
 
 #	put ID as a first element of data
 labelData(argumentList[1])
@@ -159,7 +275,16 @@ while not sup :
 supIndexes = supIndex( sup, no )
 
 #	extract supIndexes and write to arff file
+#	write set_training.arff and set_test.arff
+(Training, Test) = createTT(supIndexes, data)
+
+#	convert lists to arff files
+#	rmLabels decides whether to remove labels from test set
+rmLabels = True
+saveToarff(arffHeader, Training, Test, rmLabels)
+
 #	train classifiers with mentioned schemes and write them to files
+trainClassifier()
 
 #	ask for numbers of samples to to add and boost classifier
 #	classify randomly chosen samles choosing all that agrees in majority
