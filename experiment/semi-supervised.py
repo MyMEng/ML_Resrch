@@ -353,6 +353,84 @@ def extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR ) :
 #
 #
 ################################################################################
+################################################################################
+# pair matching predictions
+#	each input element is a list of tuples (ID, prediction)
+#
+def matchPredictions( IBk, J48, SMOP, SMOR ) :
+	# 0: all the same predictions | 1: 3/4 | 2: 2/4 | 3: none
+	predictionQnt, predictionInd = [0, 0, 0, 0], [[], [], [], []]
+
+	# length of all inputs is the same
+	# all are sorted so should have the same IDs
+	for i in range(len(IBk)) :
+		if IBk[i][0] == J48[i][0] == SMOP[i][0] == SMOR[i][0] :
+			if IBk[i][1] == J48[i][1] == SMOP[i][1] == SMOR[i][1] :
+				predictionQnt[0] += 1
+				predictionInd[0].append( IBk[i][0] )
+
+			elif( IBk[i][1] == J48[i][1] == SMOP[i][1] or
+				IBk[i][1] == J48[i][1] == SMOR[i][1] or
+				IBk[i][1] == SMOP[i][1] == SMOR[i][1] or
+				J48[i][1] == SMOP[i][1] == SMOR[i][1] ) :
+
+				predictionQnt[1] += 1
+				predictionInd[1].append( IBk[i][0] )
+
+			elif ( IBk[i][1] == J48[i][1] or
+				IBk[i][1] == SMOP[i][1] or
+				IBk[i][1] == SMOR[i][1] or
+				J48[i][1] == SMOP[i][1] or
+				J48[i][1] == SMOR[i][1] or
+				SMOP[i][1] == SMOR[i][1] ) :
+
+				predictionQnt[2] += 1
+				predictionInd[2].append( IBk[i][0] )
+
+			else :
+				predictionQnt[3] += 1
+				predictionInd[3].append( IBk[i][0] )
+
+		else :
+			print "Sorted indexes do not match. Unknown error!"
+			exit()
+
+	return ( predictionQnt, predictionInd )
+#
+#
+#
+################################################################################
+################################################################################
+# rebuild data sets with given details
+#
+#
+def rebuildSets( boostNum, predictionInd, supIndexes ) :
+	bnt = boostNum
+	runOutOfIndexes = False
+	temp = []
+
+	# start emptying the first list
+	for ie in predictionInd:
+		for je in ie :
+			if bnt <= 0 :
+				runOutOfIndexes = True
+				break
+			# convert ID to index (subtract 1). Later starts from 0 ID from 1
+			temp.append(je-1)
+			bnt -= 1
+		if runOutOfIndexes :
+			break
+
+	# merge lists
+	supIndexes += temp
+	# sort indexes
+	supIndexes.sort()
+
+	return supIndexes
+#
+#
+#
+################################################################################
 
 
 # main program
@@ -434,73 +512,80 @@ while not sup :
 #	Give a list of indexes to use for supervised learning
 supIndexes = supIndex( sup, noInstances )
 
-#	extract supIndexes and write to arff file
-(Training, Test) = createTT(supIndexes, data)
-(empty, unlabeledTest) = createTT(supIndexes, unlabeledData)
+#	whether to make next iteration
+cont = True
+while cont :
+	# 1
+	#	extract supIndexes and write to arff file
+	(Training, Test) = createTT(supIndexes, data)
+	(empty, unlabeledTest) = createTT(supIndexes, unlabeledData)
 
-#	convert lists to arff files and write set_training.arff and set_test.arff
-#	rmLabels decides whether to use labeled data or unlabeled as test set
-rmLabels = False # True
-saveToarff(argumentList[1], arffHeader, unlabeledArffHeader, Training, Test,
-	unlabeledTest, rmLabels)
+	#	convert lists to arff files and write set_training.arff and
+	#	set_test.arff rmLabels decides whether to use labeled data or unlabeled
+	#	as test set
+	rmLabels = False # True
+	saveToarff(argumentList[1], arffHeader, unlabeledArffHeader, Training, Test,
+		unlabeledTest, rmLabels)
 
-# 1
-#	train classifiers on initial train set with mentioned schemes and test
-#	(predict) on rest and return raw outputs
-( rawIBk, rawJ48, rawSMOP, rawSMOR ) = trainClassifier(argumentList[1])
+	cont = True
+	#	train classifiers on initial train set with mentioned schemes and test
+	#	(predict) on rest and return raw outputs
+	( rawIBk, rawJ48, rawSMOP, rawSMOR ) = trainClassifier(argumentList[1])
 
-#	make sens of outputs
-( IBk, J48, SMOP, SMOR ) = extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR )
+	#	make sens of outputs
+	( IBk, J48, SMOP, SMOR ) = extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR )
 
-#	check matching predictions
+	#	check matching predictions
+	( predictionQnt, predictionInd ) = matchPredictions( IBk, J48, SMOP, SMOR )
 
-#	ask for numbers of samples to to add and boost classifier
-boostNums = None
-boostNum = 0
-while not boostNums :
-	try:
-		# give current statistics
-		print( "========================================" +
-			"========================================" )
-		print( "There are: " + "num" + " instances that agree in all 4 " +
-			"classifiers." )
-		print( "There are: " + "num" + " instances that agree in 3 out of 4 " +
-			"classifiers." )
-		print( "There are: " + "num" + " instances that agree in 2 out of 4 " +
-			"classifiers." )
-		print( "There are: " + "num" + " instances that agree in 1 out of 4 " +
-			"classifiers." )
-		print( "There are: " + "num" + " instances that agree in non of " +
-			"classifiers." )
-		print( "Priority in choosing instances for boost operation is given " +
-			"to ones that agrees in most of classifiers." )
-		print( "========================================" +
-			"========================================\n" )
+	#	ask for numbers of samples to to add and boost classifier
+	boostNums = None
+	boostNum = 0
+	while not boostNums :
+		try:
+			# give current statistics
+			print( "========================================" +
+				"========================================" )
+			print( "There are: " + str(predictionQnt[0]) + " instances that agree" +
+				" in all 4 classifiers." )
+			print( "There are: " + str(predictionQnt[1]) + " instances that agree" +
+				" in 3 out of 4 classifiers." )
+			print( "There are: " + str(predictionQnt[2]) + " instances that agree" +
+				" in 2 out of 4 classifiers." )
+			print( "There are: " + str(predictionQnt[3]) + " instances that agree" +
+				" in non of classifiers." )
+			print( "Priority in choosing instances for boost operation is given " +
+				"to ones that agrees in most of classifiers." )
+			print( "========================================" +
+				"========================================\n" )
 
-		boostNums = raw_input( "How many out of " + str(noInstances-sup) +
-			" instances do you want to use to boost classifier?" + "\n" +
-			"If you want to stop boosting operation and check accuracy of " +
-			"classifier put letter [s]." )
+			boostNums = raw_input( "How many out of " +
+				str(noInstances-len(supIndexes)) + " instances do you want to" +
+				" use to boost classifier?\nIf you want to stop boosting " +
+				"operation and check accuracy of classifier put letter [s]: " )
 
-		# if user put 's' stop boosting
-		if boostNums == 's' :
-			# go to 'cross-validating' classifier
-			continue
+			# if user put 's' stop boosting
+			if boostNums == 's' :
+				# go to 'cross-validating' classifier
+				cont = False
+				continue
 
-		boostNum = int( boostNums )
+			boostNum = int( boostNums )
 
-		# number must be greater than 0
-		if boostNum <= 0 :
-			print "Number must be greater than 0!"
+			# number must be greater than 0
+			if boostNum <= 0 :
+				print "Number must be greater than 0!"
+				boostNums = None
+
+		except ValueError:
+			print 'Invalid Number. I you want to stop put [s].'
 			boostNums = None
 
-	except ValueError:
-		print 'Invalid Number. I you want to stop put [s].'
-		boostNums = None
-
-#	rebuilt classifier with # of samples defined by user choosing all instances
-#	where majority of classifiers agrees
-#boils down to rebuilding datasets and going back to stage #1
+	#	rebuilt classifier with # of samples defined by user choosing all instances
+	#	where majority of classifiers agrees boils down to rebuilding datasets and
+	#	going back to stage #1
+	if cont :
+		supIndexes = rebuildSets( boostNum, predictionInd, supIndexes )
 
 
 #
