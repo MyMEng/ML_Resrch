@@ -16,33 +16,37 @@ removeFilter1 = "weka.filters.unsupervised.attribute.Remove -R "
 removeFilter2 = " -i "
 removeFilter3 = " -o "
 addIDfilter = "weka.filters.unsupervised.attribute.AddID -i "
+
+meta1 = "weka.classifiers.meta.FilteredClassifier -F \'" # remove filter + in
+meta2 =	" \' -W " # + classifier w/o options + -t train -T test -p 1
+meta3 = " -- " # other classifer options -C 0.25 -M 2
+
+trainingSwitch = " -t "
+testSwitch = " -T "
+
 #	J48
-J481a = "weka.classifiers.trees.J48 -C 0.25 -M 2 -p 1 -s "
-J481b = "weka.classifiers.trees.J48 -C 0.25 -M 2 -v -o -s "
-J482 = " -t "
-J483 = " -T "
+J481a = "weka.classifiers.trees.J48 -v -o -s "
+J481b = " -C 0.25 -M 2 "
+J482a = "weka.classifiers.trees.J48 -p 1 "
+J482b = J481b
 #	SMO-Poly
-SMOP1a = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
-	"-p 1 -s " )
-SMOP1b = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
-	"-v -o -s " )
-SMOP2 = ( " -N 0 -V -1 -W 1 -K \"weka.classifiers.functions." +
-	"supportVector.PolyKernel -C 250007 -E 1.0\" -t " )
-SMOP3 = " -T "
+SMOP1a = "weka.classifiers.functions.SMO -v -o -s "
+SMOP1b = ( " -C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.functions." +
+	"supportVector.PolyKernel -C 250007 -E 1.0\"" )
+SMOP2a = "weka.classifiers.functions.SMO -p 1 "
+SMOP2b = SMOP1b
 #	SMO-RBF
-SMOR1a = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
-	"-p 1 -s " )
-SMOR1b = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
-	"-v -o -s " )
-SMOR2 = ( " -N 0 -V -1 -W 1 -K \"weka.classifiers.functions.supportVector." +
-	"RBFKernel -C 250007 -G 0.01\" -t " )
-SMOR3 = " -T "
+SMOR1a = "weka.classifiers.functions.SMO -v -o -s "
+SMOR1b = ( " -C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.functions.supportVector." +
+	"RBFKernel -C 250007 -G 0.01\"" )
+SMOR2a = "weka.classifiers.functions.SMO -p 1 "
+SMOR2b = SMOR1b
 #	IBk
-IBk1a = "weka.classifiers.lazy.IBk -p 1 -s "
-IBk1b = "weka.classifiers.lazy.IBk -v -o -s "
-IBk2 = ( " -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A " +
-	"\\\"weka.core.EuclideanDistance -R first-last\\\"\" -t " )
-IBk2 = " -T "
+IBk1a = "weka.classifiers.lazy.IBk -v -o -s "
+IBk1b = ( " -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A " +
+	"\\\"weka.core.EuclideanDistance -R first-last\\\"\"" )
+IBk2a = "weka.classifiers.lazy.IBk -p 1 "
+IBk2b = IBk1b
 
 
 # functions
@@ -244,33 +248,48 @@ def saveToarff(fileName, arffHeader, unlabeledArffHeader, Training, Test,
 #	data
 #
 def trainClassifier(fileName) :
+	# take a random seed
+	# r = 0
+
 	# classify with J48
-	clas = subprocess.Popen( weka + J481a + fileName[0:-5] + "" +
-		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
+	# r = randint(1, 1000000)
+	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+		J482a + trainingSwitch + fileName[0:-5] + "_labeledTraining.arff" + 
+		testSwitch + fileName[0:-5] + "_unlabeledTest.arff" + meta3 + J482b,
+		stdout=subprocess.PIPE, shell=True )
 	(J48, err) = clas.communicate()
 	if err!=None:
 		print "Error while classifying J48:\n" + err
 		exit()
 
 	# classify with IBk
-	clas = subprocess.Popen( weka + addIDfilter + fileName + " -o " +
-		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
+	# r = randint(1, 1000000)
+	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+		IBk2a + trainingSwitch + fileName[0:-5] + "_labeledTraining.arff" + 
+		testSwitch + fileName[0:-5] + "_unlabeledTest.arff" + meta3 + IBk2b,
+		stdout=subprocess.PIPE, shell=True )
 	(IBk, err) = clas.communicate()
 	if err!=None:
 		print "Error while classifying IBk:\n" + err
 		exit()
 
 	# classify with SMO-Poly
-	clas = subprocess.Popen( weka + addIDfilter + fileName + " -o " +
-		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
+	# r = randint(1, 1000000)
+	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+		SMOP2a + trainingSwitch + fileName[0:-5] + "_labeledTraining.arff" + 
+		testSwitch + fileName[0:-5] + "_unlabeledTest.arff" + meta3 + SMOP2b,
+		stdout=subprocess.PIPE, shell=True )
 	(SMOP, err) = clas.communicate()
 	if err!=None:
 		print "Error while classifying SMO-Poly:\n" + err
 		exit()
 
 	# classify with SMO-RBF
-	clas = subprocess.Popen( weka + addIDfilter + fileName + " -o " +
-		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
+	# r = randint(1, 1000000)
+	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+		SMOR2a + trainingSwitch + fileName[0:-5] + "_labeledTraining.arff" + 
+		testSwitch + fileName[0:-5] + "_unlabeledTest.arff" + meta3 + SMOR2b,
+		stdout=subprocess.PIPE, shell=True )
 	(SMOR, err) = clas.communicate()
 	if err!=None:
 		print "Error while classifying SMO-RBF:\n" + err
@@ -369,7 +388,7 @@ supIndexes = supIndex( sup, noInstances )
 
 #	convert lists to arff files and write set_training.arff and set_test.arff
 #	rmLabels decides whether to use labeled data or unlabeled as test set
-rmLabels = True
+rmLabels = False # True
 saveToarff(argumentList[1], arffHeader, unlabeledArffHeader, Training, Test,
 	unlabeledTest, rmLabels)
 
@@ -386,6 +405,24 @@ boostNums = None
 boostNum = 0
 while not boostNums :
 	try:
+		# give current statistics
+		print( "========================================" +
+			"========================================" )
+		print( "There are: " + "num" + " instances that agree in all 4 " +
+			"classifiers." )
+		print( "There are: " + "num" + " instances that agree in 3 out of 4 " +
+			"classifiers." )
+		print( "There are: " + "num" + " instances that agree in 2 out of 4 " +
+			"classifiers." )
+		print( "There are: " + "num" + " instances that agree in 1 out of 4 " +
+			"classifiers." )
+		print( "There are: " + "num" + " instances that agree in non of " +
+			"classifiers." )
+		print( "Priority in choosing instances for boost operation is given " +
+			"to ones that agrees in most of classifiers." )
+		print( "========================================" +
+			"========================================\n" )
+
 		boostNums = raw_input( "How many out of " + str(noInstances-sup) +
 			" instances do you want to use to boost classifier?" + "\n" +
 			"If you want to stop boosting operation and check accuracy of " +
@@ -412,6 +449,9 @@ while not boostNums :
 #boils down to rebuilding datasets and going back to stage #1
 
 
+# if no xml file only the last one is alable
+
+
 #
 ##	Sunday
 #
@@ -419,3 +459,6 @@ while not boostNums :
 
 #	then perform n-times with each of classifiers with cross validation
 #	to compare accuracy of results
+
+#	if theres enough time implement multilabel with 1 label at time using reformdata.py
+#	from your last project

@@ -35,9 +35,6 @@
 *.pdf
 
 # Python
-experiment/emotions.arff
-experiment/emotions_ID.arff
-experiment/emotions.xml
-experiment/emotions_labeledTraining.arff
-experiment/emotions_unlabeledTest.arff
-emotions_unlabeled.arff
+experiment/*.arff
+experiment/*.xml
+experiment/data/*
