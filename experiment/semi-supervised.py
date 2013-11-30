@@ -17,35 +17,32 @@ removeFilter2 = " -i "
 removeFilter3 = " -o "
 addIDfilter = "weka.filters.unsupervised.attribute.AddID -i "
 #	J48
-classAsignA = "weka.classifiers.trees.J48 -C 0.25 -M 2 -p 1 -s "
-classAsignB = " -t "
-classifierA = "weka.classifiers.trees.J48 -C 0.25 -M 2 -v -o -s "
-classifierB = " -t "
+J481a = "weka.classifiers.trees.J48 -C 0.25 -M 2 -p 1 -s "
+J481b = "weka.classifiers.trees.J48 -C 0.25 -M 2 -v -o -s "
+J482 = " -t "
+J483 = " -T "
 #	SMO-Poly
-classAsignA = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
+SMOP1a = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
 	"-p 1 -s " )
-classAsignB = ( " -N 0 -V -1 -W 1 -K \"weka.classifiers.functions." +
-	"supportVector.PolyKernel -C 250007 -E 1.0\" -t " )
-classifierA = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
+SMOP1b = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
 	"-v -o -s " )
-classifierB = ( " -N 0 -V -1 -W 1 -K \"weka.classifiers.functions." +
+SMOP2 = ( " -N 0 -V -1 -W 1 -K \"weka.classifiers.functions." +
 	"supportVector.PolyKernel -C 250007 -E 1.0\" -t " )
+SMOP3 = " -T "
 #	SMO-RBF
-classAsignA = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
+SMOR1a = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
 	"-p 1 -s " )
-classAsignB = ( " -N 0 -V -1 -W 1 -K \"weka.classifiers.functions." +
-	"supportVector.PolyKernel -C 250007 -E 1.0\" -t " )
-classifierA = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
+SMOR1b = ( "weka.classifiers.functions.SMO -C 1.0 -L 0.0010 -P 1.0E-12 " +
 	"-v -o -s " )
-classifierB = ( " -N 0 -V -1 -W 1 -K \"weka.classifiers.functions." +
-	"supportVector.PolyKernel -C 250007 -E 1.0\" -t " )
+SMOR2 = ( " -N 0 -V -1 -W 1 -K \"weka.classifiers.functions.supportVector." +
+	"RBFKernel -C 250007 -G 0.01\" -t " )
+SMOR3 = " -T "
 #	IBk
-classAsignA = "weka.classifiers.lazy.IBk -p 1 -s "
-classAsignB = ( " -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A " +
+IBk1a = "weka.classifiers.lazy.IBk -p 1 -s "
+IBk1b = "weka.classifiers.lazy.IBk -v -o -s "
+IBk2 = ( " -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A " +
 	"\\\"weka.core.EuclideanDistance -R first-last\\\"\" -t " )
-classifierA = "weka.classifiers.lazy.IBk -v -o -s "
-classifierB = ( " -K 1 -W 0 -A \"weka.core.neighboursearch.LinearNNSearch -A " +
-	"\\\"weka.core.EuclideanDistance -R first-last\\\"\" -t " )
+IBk2 = " -T "
 
 
 # functions
@@ -69,9 +66,9 @@ def countLabels(labels) :
 # give # to all data instances to be able to distinguish them later on
 #
 #
-def labelData(fileName):
+def IDdata(fileName):
 	clas = subprocess.Popen( weka + addIDfilter + fileName + " -o " +
-		fileName[0:-5] + "_ID.arff",	stdout=subprocess.PIPE, shell=True )
+		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
 	(out, err) = clas.communicate()
 	if err!=None:
 		print "Error while appending ID:\n" + err
@@ -84,10 +81,10 @@ def labelData(fileName):
 # remove ground truth for labels
 #
 #
-def unlabelData(fileName, IDrange):
+def rmAttributes(fileName, IDrange):
 	clas = subprocess.Popen( weka + removeFilter1 + IDrange + removeFilter2 +
-		fileName + removeFilter3 + fileName[0:-5] + "_unlabeled.arff",
-		stdout=subprocess.PIPE, shell=True )
+		fileName[0:-5] + "_ID.arff" + removeFilter3 + fileName[0:-5] +
+		"_unlabeled.arff", stdout=subprocess.PIPE, shell=True )
 	(out, err) = clas.communicate()
 	if err!=None:
 		print "Error while removing labels:\n" + err
@@ -142,7 +139,8 @@ def countAtributes( data ) :
 		if i == ',' :
 			count += 1
 
-	return count
+	# one less comma than instances
+	return count + 1
 #
 #
 #
@@ -181,7 +179,7 @@ def supIndex(noToExtract, noInstances) :
 ################################################################################
 ################################################################################
 # generate 2 lists: one containing training(labeled) instances and the other
-# unlabeled instances to improve a classifier
+# list of instances to instances to improve a classifier
 #
 def createTT(removeInd, instances) :
 	rm = removeInd[:]
@@ -210,15 +208,21 @@ def createTT(removeInd, instances) :
 # create arff files with selected instances
 #
 #
-def saveToarff(arffHeader, Training, Test, removeLabels) :
+def saveToarff(fileName, arffHeader, unlabeledArffHeader, Training, Test,
+	unlabeledTest, removeLabels) :
 	# open two files to write
-	testStream = open( argumentList[1][0:-5]+"_unlabeledTest.arff", 'w')
-	trainingStream = open( argumentList[1][0:-5]+"_labeledTraining.arff", 'w')
+	testStream = open( fileName[0:-5]+"_unlabeledTest.arff", 'w')
+	trainingStream = open( fileName[0:-5]+"_labeledTraining.arff", 'w')
 
 	# save header info to streams
 	for i in arffHeader :
-		testStream.write(i)
 		trainingStream.write(i)
+	if removeLabels :
+		for i in unlabeledArffHeader :
+			testStream.write(i)
+	else :
+		for i in arffHeader :
+			testStream.write(i)
 
 	# save training info to streams
 	for i in Training :
@@ -226,9 +230,8 @@ def saveToarff(arffHeader, Training, Test, removeLabels) :
 
 	# save test info to stream
 	if removeLabels :
-		for i in Test :
-			j = i[0:-5]
-			testStream.write(j)
+		for i in unlabeledTest :
+			testStream.write(i)
 	else :
 		for i in Test :
 			testStream.write(i)
@@ -237,15 +240,55 @@ def saveToarff(arffHeader, Training, Test, removeLabels) :
 #
 ################################################################################
 ################################################################################
-# train selected classifiers with newly created arff files
+# train selected classifiers with newly created arff files and test on boosting
+#	data
 #
-#
-def trainClassifier() :
-	arffHeader = []
-	Training = []
-	Test = []
+def trainClassifier(fileName) :
+	# classify with J48
+	clas = subprocess.Popen( weka + J481a + fileName[0:-5] + "" +
+		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
+	(J48, err) = clas.communicate()
+	if err!=None:
+		print "Error while classifying J48:\n" + err
+		exit()
 
-	return (arffHeader, Training, Test)
+	# classify with IBk
+	clas = subprocess.Popen( weka + addIDfilter + fileName + " -o " +
+		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
+	(IBk, err) = clas.communicate()
+	if err!=None:
+		print "Error while classifying IBk:\n" + err
+		exit()
+
+	# classify with SMO-Poly
+	clas = subprocess.Popen( weka + addIDfilter + fileName + " -o " +
+		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
+	(SMOP, err) = clas.communicate()
+	if err!=None:
+		print "Error while classifying SMO-Poly:\n" + err
+		exit()
+
+	# classify with SMO-RBF
+	clas = subprocess.Popen( weka + addIDfilter + fileName + " -o " +
+		fileName[0:-5] + "_ID.arff", stdout=subprocess.PIPE, shell=True )
+	(SMOR, err) = clas.communicate()
+	if err!=None:
+		print "Error while classifying SMO-RBF:\n" + err
+		exit()
+
+	return( IBk, J48, SMOP, SMOR )
+#
+#
+#
+################################################################################
+################################################################################
+# make sens out from weka output
+#
+#
+def extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR ) :
+	IBk, J48, SMOP, SMOR = [], [], [], []
+
+	return ( IBk, J48, SMOP, SMOR )
 #
 #
 #
@@ -287,7 +330,7 @@ while not noLabelsUsr :
 		noLabelsUsr = None
 
 #	put ID as a first element of data
-labelData(argumentList[1])
+IDdata(argumentList[1])
 
 #	open file with IDs
 rawFile = open(argumentList[1][0:-5] + "_ID.arff", 'r')
@@ -301,14 +344,19 @@ noAtributes = countAtributes(data)
 
 #	remove the ground truth for labels
 IDrangeRm = ( str(noAtributes-noLabels+1) + "-" + str(noAtributes) )
-unlabelData(argumentList[1], IDrangeRm)
+rmAttributes(argumentList[1], IDrangeRm)
+
+#	get list of data instances with removed ground truth
+rawFileUnlabeled = open(argumentList[1][0:-5] + "_unlabeled.arff", 'r')
+fileUnlabeled = list(rawFileUnlabeled)
+(empty, unlabeledArffHeader, unlabeledData) = handleInstances( fileUnlabeled )
 
 #	ask how many to use for supervised learning
 sup = None
 while not sup :
 	try:
-		sup = int( raw_input( "How many out of " + str(noInstances) + " instances do you want to use for " +
-			"supervised learning?: " ) )
+		sup = int( raw_input( "How many out of " + str(noInstances) +
+			" instances do you want to use for " + "supervised learning?: " ) )
 	except ValueError:
 		print 'Invalid Number'
 
@@ -316,20 +364,58 @@ while not sup :
 supIndexes = supIndex( sup, noInstances )
 
 #	extract supIndexes and write to arff file
-#	write set_training.arff and set_test.arff
 (Training, Test) = createTT(supIndexes, data)
+(empty, unlabeledTest) = createTT(supIndexes, unlabeledData)
 
-#	convert lists to arff files
-#	rmLabels decides whether to remove labels from test set
+#	convert lists to arff files and write set_training.arff and set_test.arff
+#	rmLabels decides whether to use labeled data or unlabeled as test set
 rmLabels = True
-saveToarff(arffHeader, Training, Test, rmLabels)
+saveToarff(argumentList[1], arffHeader, unlabeledArffHeader, Training, Test,
+	unlabeledTest, rmLabels)
 
-#	train classifiers on initial train set with mentioned schemes and write them
-#	to files
-trainClassifier()
+# 1
+#	train classifiers on initial train set with mentioned schemes and test
+#	(predict) on rest and return raw outputs
+( rawIBk, rawJ48, rawSMOP, rawSMOR ) = trainClassifier(argumentList[1])
+
+#	make sens of outputs
+( IBk, J48, SMOP, SMOR ) = extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR )
 
 #	ask for numbers of samples to to add and boost classifier
-#	classify randomly chosen samles choosing all that agrees in majority
-#	rebuilt classifier
+boostNums = None
+boostNum = 0
+while not boostNums :
+	try:
+		boostNums = raw_input( "How many out of " + str(noInstances-sup) +
+			" instances do you want to use to boost classifier?" + "\n" +
+			"If you want to stop boosting operation and check accuracy of " +
+			"classifier put letter [s]." )
 
-#	then perform n-times with each with each of classifiers to compare results
+		# if user put 's' stop boosting
+		if boostNums == 's' :
+			# go to 'cross-validating' classifier
+			continue
+
+		boostNum = int( boostNums )
+
+		# number must be greater than 0
+		if boostNum <= 0 :
+			print "Number must be greater than 0!"
+			boostNums = None
+
+	except ValueError:
+		print 'Invalid Number. I you want to stop put [s].'
+		boostNums = None
+
+#	rebuilt classifier with # of samples defined by user choosing all instances
+#	where majority of classifiers agrees
+#boils down to rebuilding datasets and going back to stage #1
+
+
+#
+##	Sunday
+#
+#	check accuracy of created classifier
+
+#	then perform n-times with each of classifiers with cross validation
+#	to compare accuracy of results
