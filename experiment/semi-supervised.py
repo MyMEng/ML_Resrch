@@ -305,9 +305,50 @@ def trainClassifier(fileName) :
 #
 #
 def extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR ) :
-	IBk, J48, SMOP, SMOR = [], [], [], []
+	rawData = [rawIBk, rawJ48, rawSMOP, rawSMOR]
+	data = [ [], [], [], [] ] # IBk, J48, SMOP, SMOR
 
-	return ( IBk, J48, SMOP, SMOR )
+	# extract _ID_ and _prediction-ID_ from raw data
+	#	find (*) brackets and extract id from inside
+	#	 frist found brackets contain 'ID' inside so ignore it
+	for ind, val in enumerate(rawData) :
+		ID = []
+		prediction = []
+		# find all brackets
+		tempIDa = [j for j, y in enumerate(val) if y == '(']
+		tempIDb = [j for j, y in enumerate(val) if y == ')']
+		# if number of brackets do not agree throw exception
+		if len(tempIDa) != len(tempIDb) :
+			print "Number of '(' and ')' does not match. Error encountered!"
+			exit()
+		# extract content of brackets
+		for i in range(1, len(tempIDa)) :
+			 ID.append( int( val[tempIDa[i]+1:tempIDb[i]] ) )
+
+		# find all the ':'
+		tempPre = [j for j, y in enumerate(val) if y == ':']
+		# if number of ':'/2 is not equal to number of ')' throw error
+		if len(tempPre)/2 != len(tempIDa)-1 :
+			print( "Number of '(' and ')' does not match with number of ':'. " +
+				"Error encountered!" )
+			exit()
+		# extract predictions
+		# WARNING - restriction up to 9 values of predicted label - ERROR
+		for i in range(1, len(tempPre), 2) :
+			prediction.append( int( val[tempPre[i]-1:tempPre[i]] ) )
+
+		# make a tuple (ID, prediction) and put into appropriate list
+		# check whether theres exact amount of elements in both lists to zip
+		if len(ID) != len(prediction) :
+			print( "Number of IDs does not match with number of predictions. " +
+				"Error encountered!" )
+			exit()
+		# zip all results into pairs (ID, prediction) and sort according to ID
+		data[ind] = zip( ID, prediction )[:]
+		# sort data according to ID
+		data[ind].sort(key=lambda tup: tup[0])
+
+	return ( data[0], data[1], data[2], data[3] )
 #
 #
 #
@@ -319,18 +360,29 @@ def extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR ) :
 argumentList = list(sys.argv)
 
 #	check correct number of arguments
-if len(argumentList)!=3:
-	print ( "There should be 2 arguments given:" + "\n" +
-		"	-*- data set in 'arff' format" + "\n"
-		"	-*- file containing labels in 'xml' format" )
+if len(argumentList) < 2:
+	print ( "There should be at least 1st argument given:" + "\n" +
+		"	-*-1st: data set in 'arff' format" + "\n"
+		"	-*-2nd: file containing labels in 'xml' format" )
+	print( "If only 1st argument is given data set is treated as single class" +
+		" classification.\n" + "If both arguments are given data is treated " +
+		"as multi class classification an classified on each label " +
+		"separately.\n" + "If you haven't supplied 2nd argument and you still" +
+		" want to classify multi-label dataset please provide number of " +
+		"labels when asked to confirm." )
 		# + "\n" + "	-*- number of iterations" )
 	exit()
 
-#	open labels data
-rawLabels = open(argumentList[2], 'r')
-labels = list(rawLabels)
-#	...and count them
-noLabels = countLabels(labels)
+#	if second argument not suppled consider data set as single labeled
+if len(argumentList) == 2 :
+	noLabels = 1
+else :
+	#	open labels data
+	rawLabels = open(argumentList[2], 'r')
+	labels = list(rawLabels)
+	#	...and count them
+	noLabels = countLabels(labels)
+
 #	check whether counting is correct
 print( str(noLabels) + " labels have(has) been found. Is it Correct?" )
 noLabelsUsr = None
@@ -400,6 +452,8 @@ saveToarff(argumentList[1], arffHeader, unlabeledArffHeader, Training, Test,
 #	make sens of outputs
 ( IBk, J48, SMOP, SMOR ) = extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR )
 
+#	check matching predictions
+
 #	ask for numbers of samples to to add and boost classifier
 boostNums = None
 boostNum = 0
@@ -447,9 +501,6 @@ while not boostNums :
 #	rebuilt classifier with # of samples defined by user choosing all instances
 #	where majority of classifiers agrees
 #boils down to rebuilding datasets and going back to stage #1
-
-
-# if no xml file only the last one is alable
 
 
 #
