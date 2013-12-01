@@ -431,6 +431,193 @@ def rebuildSets( boostNum, predictionInd, supIndexes ) :
 #
 #
 ################################################################################
+################################################################################
+# combine results into one common confusion matrix
+#
+#
+def extractConfMx( tempConf, outConf ) :
+	# check whether it's first iteration
+	if len(outConf) == 0 :
+		empty = True
+	else :
+		empty = False
+
+	# for all 4 classifiers
+	for i in tempConf :
+		tempIndex = [x for x, y in enumerate(i) if y == '|']
+		# for all found '|' go revers until '\n' found
+		for row, j in enumerate(tempIndex) :
+			# check whether it's empty if so add each time new row
+			if empty :
+				outConf.append([])
+
+			for k in reversed(range(j)) :
+				if i[k]=="\n" :
+					temp = i[k+1 : j].split()
+					for col, l in enumerate(temp) :
+						# check whether it's first iteration if so insert number
+						if empty :
+							outConf[row].append(int(l))
+						# else cumulative sum
+						else :
+							outConf[row][col] += int(l)
+					break
+		# after first classifier is done the output is no longer empty
+		empty = False
+
+	return outConf
+#
+#
+#
+################################################################################
+################################################################################
+# save the model for semi-supervised set and test it on whole set
+#
+#
+def performSemiSupervised( fileName, extTest, n ) :
+	# external test file?
+	if extTest == "none" :
+		# if none test on whole data set
+		testOnMe = ( testSwitch + fileName[0:-5] + "_ID.arff" )
+	else :
+		# else in ID-ed copy of test file
+		# create ID-ed copy of test file
+		IDdata(fileName)
+		extTest = ( testSwitch + extTest[0:-5] + "_ID.arff" )
+	
+	outConf = []
+	tempConf = []
+
+	# classify with IBk
+	r = randint(1, 1000000)
+	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+		IBk1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+		testOnMe + meta3 + IBk1b, stdout=subprocess.PIPE, shell=True )
+	(out, err) = clas.communicate()
+	tempConf.append(out)
+	if err!=None:
+		print "Error while classifying IBk:\n" + err
+		exit()
+
+	# classify with J48
+	r = randint(1, 1000000)
+	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+		J481a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+		testOnMe + meta3 + J481b, stdout=subprocess.PIPE, shell=True )
+	(out, err) = clas.communicate()
+	tempConf.append(out)
+	if err!=None:
+		print "Error while classifying J48:\n" + err
+		exit()
+
+	# classify with SMO-Poly
+	r = randint(1, 1000000)
+	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+		SMOP1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+		testOnMe + meta3 + SMOP1b, stdout=subprocess.PIPE, shell=True )
+	(out, err) = clas.communicate()
+	tempConf.append(out)
+	if err!=None:
+		print "Error while classifying SMO-Poly:\n" + err
+		exit()
+
+	# classify with SMO-RBF
+	r = randint(1, 1000000)
+	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+		SMOR1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+		testOnMe + meta3 + SMOR1b, stdout=subprocess.PIPE, shell=True )
+	(out, err) = clas.communicate()
+	tempConf.append(out)
+	if err!=None:
+		print "Error while classifying SMO-RBF:\n" + err
+		exit()
+
+	# combine results into one common confusion matrix
+	outConf = extractConfMx( tempConf, outConf )
+
+	# multiply by n to have comparative results with supervised learning
+	for i in range(len(outConf)) :
+		for j in range(len(outConf[i])) :
+			outConf[i][j] *= n
+
+	return outConf
+#
+#
+#
+################################################################################
+################################################################################
+# save the model for semi-supervised set and test it on whole set
+#
+#
+def performSupervised( fileName, extTest, n ) :
+	# external test file?
+	if extTest == "none" :
+		testOnMe = ""
+	else :
+		# create ID-ed copy of test file
+		IDdata(fileName)
+		extTest = ( testSwitch + extTest[0:-5] + "_ID.arff" )
+
+	# take a random seed
+	r = 0
+
+	outConf = []
+	tempConf = []
+
+	for i in range(n) :
+		tempConf = []
+		# classify with IBk
+		r = randint(1, 1000000)
+		clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+			IBk1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+			testOnMe + meta3 + IBk1b, stdout=subprocess.PIPE, shell=True )
+		(out, err) = clas.communicate()
+		tempConf.append(out)
+		if err!=None:
+			print "Error while classifying IBk:\n" + err
+			exit()
+
+		# classify with J48
+		r = randint(1, 1000000)
+		clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+			J481a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+			testOnMe + meta3 + J481b, stdout=subprocess.PIPE, shell=True )
+		(out, err) = clas.communicate()
+		tempConf.append(out)
+		if err!=None:
+			print "Error while classifying J48:\n" + err
+			exit()
+
+		# classify with SMO-Poly
+		r = randint(1, 1000000)
+		clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+			SMOP1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+			testOnMe + meta3 + SMOP1b, stdout=subprocess.PIPE, shell=True )
+		(out, err) = clas.communicate()
+		tempConf.append(out)
+		if err!=None:
+			print "Error while classifying SMO-Poly:\n" + err
+			exit()
+
+		# classify with SMO-RBF
+		r = randint(1, 1000000)
+		clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
+			SMOR1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+			testOnMe + meta3 + SMOR1b, stdout=subprocess.PIPE, shell=True )
+		(out, err) = clas.communicate()
+		tempConf.append(out)
+		if err!=None:
+			print "Error while classifying SMO-RBF:\n" + err
+			exit()
+
+		# combine results into one common confusion matrix
+		outConf = extractConfMx( tempConf, outConf )
+
+	return outConf
+#
+#
+#
+################################################################################
 
 
 # main program
@@ -587,14 +774,46 @@ while cont :
 	if cont :
 		supIndexes = rebuildSets( boostNum, predictionInd, supIndexes )
 
+# ERROR - powinie??nes doczepiac instance z przewidziana klasa a ine z trew klasa
 
-#
-##	Sunday
-#
-#	check accuracy of created classifier
 
 #	then perform n-times with each of classifiers with cross validation
 #	to compare accuracy of results
+repetitions = None
+while not repetitions :
+	try:
+		repetitions = int( raw_input( "How many times do you want to perform " +
+			"tests with c-v of supervised learning?: " ) )
+		if repetitions <= 0 :
+			repetitions = None
+			print "Number must be greater than 0."
+	except ValueError:
+		print 'Invalid Number'
+
+#	ask for external test set if not supplied use whole set and cross-validation
+extTest = str( raw_input( "Please give name of external test file. If you " +
+	"don't have one c-v will be performed on whole data set; in this case " +
+	" type [none]: " ) )
+
+#	check accuracy of created data set
+semisupResults = performSemiSupervised( argumentList[1], extTest, repetitions )
+supResults = performSupervised( argumentList[1], extTest, repetitions )
+
+#	print confusion matrices for both
+print( "Confusion matrix over " + repetitions +
+	" repetitions for SUPERVISED learning:" )
+printList( supResults )
+print "\n"
+print( "Confusion matrix for SEMI-SUPERVISED learning (each value multiplied " +
+	" by number of repetitions):" )
+printList( semisupResults )
+print "\n"
+(diag, summed) = getStatistics( supResults )
+print( str(diag) + " instances out of " + str(summed) + " instances were " +
+	"predicted correctly in SUPERVISED learning." )
+(diag, summed) = getStatistics( semisupResults )
+print( str(diag) + " instances out of " + str(summed) + " instances were " +
+	"predicted correctly in SEMI-SUPERVISED learning." )
 
 #	if theres enough time implement multilabel with 1 label at time using reformdata.py
 #	from your last project
