@@ -217,20 +217,22 @@ def createTT(removeInd, instances, targetClasses) :
 
 	for ind, val in enumerate(instances):
 		# instance with ground-truth
-		if i = [j for j, x in enumerate(rm) if x[0] == ind] :
+		i = [j for j, x in enumerate(rm) if x[0] == ind]
+		if i :
 		# if ind in rm :
 			# edit value bu putting predicted class at the end
 			# if 0 "ORIGINAL" encountered don't alter class with ground truth
-			if removeInd[i][1] != 0 :
-				lineList ("".join(val.split())).split(',')
-				lineList[-1] = targetClasses[removeInd[i][1]]
+			if rm[i[0]][1] != 0 :
+				lineList = ("".join(val.split())).split(',')
+				lineList[-1] = targetClasses[rm[i[0]][1]]
 				value = ','.join(lineList)
+				value += "\n"
 			else :
 				value = val
 			# append element to training
 			training.append(value)
 			# remove ind element
-			rm.remove(removeInd[i[0]])
+			rm.remove(rm[i[0]])
 			continue
 		# else append to test
 		test.append(val)
@@ -405,21 +407,21 @@ def matchPredictions( IBk, J48, SMOP, SMOR ) :
 			if IBk[i][1] == J48[i][1] == SMOP[i][1] == SMOR[i][1] :
 				predictionQnt[0] += 1
 				predictionInd[0].append( IBk[i][0] )
-				predictionClass[0].append( IBK[i][1] )
+				predictionClass[0].append( IBk[i][1] )
 
 			# if 3 out of 4 predictions are the same
 			elif IBk[i][1] == J48[i][1] == SMOP[i][1] :
 				predictionQnt[1] += 1
 				predictionInd[1].append( IBk[i][0] )
-				predictionClass[1].append( IBK[i][1] )
+				predictionClass[1].append( IBk[i][1] )
 			elif IBk[i][1] == J48[i][1] == SMOR[i][1] :
 				predictionQnt[1] += 1
 				predictionInd[1].append( IBk[i][0] )
-				predictionClass[1].append( IBK[i][1] )
+				predictionClass[1].append( IBk[i][1] )
 			elif IBk[i][1] == SMOP[i][1] == SMOR[i][1] :
 				predictionQnt[1] += 1
 				predictionInd[1].append( IBk[i][0] )
-				predictionClass[1].append( IBK[i][1] )
+				predictionClass[1].append( IBk[i][1] )
 			elif J48[i][1] == SMOP[i][1] == SMOR[i][1] :
 				predictionQnt[1] += 1
 				predictionInd[1].append( J48[i][0] )
@@ -548,7 +550,7 @@ def rebuildSets( boostNum, predictionInd, predictionClass, supIndexes ) :
 	# zip ind with class
 	temp = zip( tempInd, tempClass )
 	# merge lists
-	supIndexes += tempInd
+	supIndexes += temp
 	# sort indexes
 	supIndexes.sort(key=lambda tup: tup[0])
 
@@ -944,8 +946,8 @@ while cont :
 	#	going back to stage #1
 	if cont :
 		# ERROR - powinie??nes doczepiac instance z przewidziana klasa a ine z trew klasa
-		(supIndexes, supClasses) = rebuildSets( boostNum, predictionInd,
-			predictionClass, supIndexes )
+		supIndexes = rebuildSets( boostNum, predictionInd, predictionClass,
+			supIndexes )
 
 
 #	then perform n-times with each of classifiers with cross validation
