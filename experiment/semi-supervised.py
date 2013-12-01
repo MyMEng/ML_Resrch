@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-
-# import section
-# import os
 import sys
 import subprocess
-# import numpy
 from random import randint
+from random import choice
+# import numpy as np
+# import section
+# import os
 # import pickle
 
 
@@ -166,7 +166,7 @@ def supIndex(noToExtract, noInstances) :
 		# generate random between 0 and noInstances included
 		r = randint(0, noInstances - 1)
 		# if already appended to remove find another one
-		# ???????what if all are included???????
+		# ???????what if all are included??????? - ERROR
 		# try 1.5*noInstances times if not throw error
 		while r in remove :
 			if lock > 1.5*noInstances :
@@ -360,42 +360,129 @@ def extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR ) :
 def matchPredictions( IBk, J48, SMOP, SMOR ) :
 	# 0: all the same predictions | 1: 3/4 | 2: 2/4 | 3: none
 	predictionQnt, predictionInd = [0, 0, 0, 0], [[], [], [], []]
+	predictionClass = [[], [], [], []]
 
 	# length of all inputs is the same
 	# all are sorted so should have the same IDs
 	for i in range(len(IBk)) :
 		if IBk[i][0] == J48[i][0] == SMOP[i][0] == SMOR[i][0] :
+			# if all 4 predictions are the same
 			if IBk[i][1] == J48[i][1] == SMOP[i][1] == SMOR[i][1] :
 				predictionQnt[0] += 1
 				predictionInd[0].append( IBk[i][0] )
+				predictionClass[0].append( IBK[i][1] )
 
-			elif( IBk[i][1] == J48[i][1] == SMOP[i][1] or
-				IBk[i][1] == J48[i][1] == SMOR[i][1] or
-				IBk[i][1] == SMOP[i][1] == SMOR[i][1] or
-				J48[i][1] == SMOP[i][1] == SMOR[i][1] ) :
-
+			# if 3 out of 4 predictions are the same
+			elif IBk[i][1] == J48[i][1] == SMOP[i][1] :
 				predictionQnt[1] += 1
 				predictionInd[1].append( IBk[i][0] )
+				predictionClass[1].append( IBK[i][1] )
+			elif IBk[i][1] == J48[i][1] == SMOR[i][1] :
+				predictionQnt[1] += 1
+				predictionInd[1].append( IBk[i][0] )
+				predictionClass[1].append( IBK[i][1] )
+			elif IBk[i][1] == SMOP[i][1] == SMOR[i][1] :
+				predictionQnt[1] += 1
+				predictionInd[1].append( IBk[i][0] )
+				predictionClass[1].append( IBK[i][1] )
+			elif J48[i][1] == SMOP[i][1] == SMOR[i][1] :
+				predictionQnt[1] += 1
+				predictionInd[1].append( J48[i][0] )
+				predictionClass[1].append( J48[i][1] )
 
-			elif ( IBk[i][1] == J48[i][1] or
-				IBk[i][1] == SMOP[i][1] or
-				IBk[i][1] == SMOR[i][1] or
-				J48[i][1] == SMOP[i][1] or
-				J48[i][1] == SMOR[i][1] or
-				SMOP[i][1] == SMOR[i][1] ) :
+			# if 2 out of 4 predictions are the same
+			# also check whether other 2 are the same and if so toss a coin
+			elif IBk[i][1] == J48[i][1] :
+				if SMOP[i][1] == SMOR[i][1] :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					# toss coin
+					if randint(0,1) :
+						predictionClass[2].append( IBk[i][1] )
+					else :
+						predictionClass[2].append( SMOP[i][1] )
 
-				predictionQnt[2] += 1
-				predictionInd[2].append( IBk[i][0] )
-
+				else :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					predictionClass[2].append( IBk[i][1] )
+			elif IBk[i][1] == SMOP[i][1] :
+				if J48[i][1] == SMOR[i][1] :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					# toss coin
+					if randint(0,1) :
+						predictionClass[2].append( IBk[i][1] )
+					else :
+						predictionClass[2].append( J48[i][1] )
+				else :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					predictionClass[2].append( IBk[i][1] )
+			elif IBk[i][1] == SMOR[i][1] :
+				if J48[i][1] == SMOP[i][1] :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					# toss coin
+					if randint(0,1) :
+						predictionClass[2].append( IBk[i][1] )
+					else :
+						predictionClass[2].append( J48[i][1] )
+				else :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					predictionClass[2].append( IBk[i][1] )
+			elif J48[i][1] == SMOP[i][1] :
+				if IBk[i][1] == SMOR[i][1] :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					# toss coin
+					if randint(0,1) :
+						predictionClass[2].append( J48[i][1] )
+					else :
+						predictionClass[2].append( IBk[i][1] )
+				else :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					predictionClass[2].append( J48[i][1] )
+			elif J48[i][1] == SMOR[i][1] :
+				if IBk[i][1] == SMOP[i][1] :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					# toss coin
+					if randint(0,1) :
+						predictionClass[2].append( J48[i][1] )
+					else :
+						predictionClass[2].append( IBk[i][1] )
+				else :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					predictionClass[2].append( J48[i][1] )
+			elif SMOP[i][1] == SMOR[i][1] :
+				if IBk[i][1] == J48[i][1] :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					# toss coin
+					if randint(0,1) :
+						predictionClass[2].append( SMOP[i][1] )
+					else :
+						predictionClass[2].append( IBk[i][1] )
+				else :
+					predictionQnt[2] += 1
+					predictionInd[2].append( IBk[i][0] )
+					predictionClass[2].append( SMOP[i][1] )
 			else :
 				predictionQnt[3] += 1
 				predictionInd[3].append( IBk[i][0] )
+				# as all predictions are different randomly choose one class
+				tmpls = [ IBk[i][1], J48[i][1], SMOP[i][1], SMOR[i][1] ]
+				predictionClass[3].append( choice(tmpls) )
 
 		else :
 			print "Sorted indexes do not match. Unknown error!"
 			exit()
 
-	return ( predictionQnt, predictionInd )
+	return ( predictionQnt, predictionInd, predictionClass )
 #
 #
 #
@@ -404,10 +491,12 @@ def matchPredictions( IBk, J48, SMOP, SMOR ) :
 # rebuild data sets with given details
 #
 #
-def rebuildSets( boostNum, predictionInd, supIndexes ) :
+def rebuildSets( boostNum, predictionInd, predictionClass, supIndexes ) :
 	bnt = boostNum
 	runOutOfIndexes = False
 	temp = []
+
+	# [pair]
 
 	# start emptying the first list
 	for ie in predictionInd:
@@ -426,7 +515,8 @@ def rebuildSets( boostNum, predictionInd, supIndexes ) :
 	# sort indexes
 	supIndexes.sort()
 
-	return supIndexes
+	# 0 in supClasses means original class
+	return ( supIndexes, supClasses )
 #
 #
 #
@@ -482,8 +572,8 @@ def performSemiSupervised( fileName, extTest, n ) :
 	else :
 		# else in ID-ed copy of test file
 		# create ID-ed copy of test file
-		IDdata(fileName)
-		extTest = ( testSwitch + extTest[0:-5] + "_ID.arff" )
+		IDdata(extTest)
+		testOnMe = ( testSwitch + extTest[0:-5] + "_ID.arff" )
 	
 	outConf = []
 	tempConf = []
@@ -491,8 +581,8 @@ def performSemiSupervised( fileName, extTest, n ) :
 	# classify with IBk
 	r = randint(1, 1000000)
 	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
-		IBk1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
-		testOnMe + meta3 + IBk1b, stdout=subprocess.PIPE, shell=True )
+		IBk1a + str(r) + trainingSwitch + fileName[0:-5] + "_labeledTraining." +
+		"arff" + testOnMe + meta3 + IBk1b, stdout=subprocess.PIPE, shell=True )
 	(out, err) = clas.communicate()
 	tempConf.append(out)
 	if err!=None:
@@ -502,8 +592,8 @@ def performSemiSupervised( fileName, extTest, n ) :
 	# classify with J48
 	r = randint(1, 1000000)
 	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
-		J481a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
-		testOnMe + meta3 + J481b, stdout=subprocess.PIPE, shell=True )
+		J481a + str(r) + trainingSwitch + fileName[0:-5] + "_labeledTraining." +
+		"arff" + testOnMe + meta3 + J481b, stdout=subprocess.PIPE, shell=True )
 	(out, err) = clas.communicate()
 	tempConf.append(out)
 	if err!=None:
@@ -513,8 +603,8 @@ def performSemiSupervised( fileName, extTest, n ) :
 	# classify with SMO-Poly
 	r = randint(1, 1000000)
 	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
-		SMOP1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
-		testOnMe + meta3 + SMOP1b, stdout=subprocess.PIPE, shell=True )
+		SMOP1a + str(r) + trainingSwitch + fileName[0:-5] + "_labeledTraining."+
+		"arff" + testOnMe + meta3 + SMOP1b, stdout=subprocess.PIPE, shell=True )
 	(out, err) = clas.communicate()
 	tempConf.append(out)
 	if err!=None:
@@ -524,8 +614,8 @@ def performSemiSupervised( fileName, extTest, n ) :
 	# classify with SMO-RBF
 	r = randint(1, 1000000)
 	clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
-		SMOR1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
-		testOnMe + meta3 + SMOR1b, stdout=subprocess.PIPE, shell=True )
+		SMOR1a + str(r) + trainingSwitch + fileName[0:-5] + "_labeledTraining."+
+		"arff" + testOnMe + meta3 + SMOR1b, stdout=subprocess.PIPE, shell=True )
 	(out, err) = clas.communicate()
 	tempConf.append(out)
 	if err!=None:
@@ -555,8 +645,8 @@ def performSupervised( fileName, extTest, n ) :
 		testOnMe = ""
 	else :
 		# create ID-ed copy of test file
-		IDdata(fileName)
-		extTest = ( testSwitch + extTest[0:-5] + "_ID.arff" )
+		IDdata(extTest)
+		testOnMe = ( testSwitch + extTest[0:-5] + "_ID.arff" )
 
 	# take a random seed
 	r = 0
@@ -614,6 +704,46 @@ def performSupervised( fileName, extTest, n ) :
 		outConf = extractConfMx( tempConf, outConf )
 
 	return outConf
+#
+#
+#
+################################################################################
+################################################################################
+# print list with nice formating
+#
+#
+def printList( ls ) :
+	print "\n"
+	for i in ls :
+		tmp = "	"
+		for j in i :
+			tmp += ( str(j) + "	" )
+		tm = tmp[0:-1]
+		tm += "\n"
+		print tm
+#
+#
+#
+################################################################################
+################################################################################
+# count trace and sum of matrix
+#
+#
+def getStatistics( mx ) :
+	diag = 0
+	summed = 0
+
+	# check whether it's squared matrix
+	if len(mx) != len(mx[0]) :
+		print "Matrix is not square!"
+		exit()
+
+	for i in range(len(mx)) :
+		diag += mx[i][i]
+		for j in range(len(mx[i])) :
+			summed += mx[i][j]
+	
+	return (diag, summed)
 #
 #
 #
@@ -723,7 +853,8 @@ while cont :
 	( IBk, J48, SMOP, SMOR ) = extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR )
 
 	#	check matching predictions
-	( predictionQnt, predictionInd ) = matchPredictions( IBk, J48, SMOP, SMOR )
+	( predictionQnt, predictionInd, predictionClass ) = matchPredictions( IBk,
+		J48, SMOP, SMOR )
 
 	#	ask for numbers of samples to to add and boost classifier
 	boostNums = None
@@ -772,9 +903,9 @@ while cont :
 	#	where majority of classifiers agrees boils down to rebuilding datasets and
 	#	going back to stage #1
 	if cont :
-		supIndexes = rebuildSets( boostNum, predictionInd, supIndexes )
-
-# ERROR - powinie??nes doczepiac instance z przewidziana klasa a ine z trew klasa
+		# ERROR - powinie??nes doczepiac instance z przewidziana klasa a ine z trew klasa
+		(supIndexes, supClasses) = rebuildSets( boostNum, predictionInd,
+			predictionClass, supIndexes )
 
 
 #	then perform n-times with each of classifiers with cross validation
@@ -800,7 +931,7 @@ semisupResults = performSemiSupervised( argumentList[1], extTest, repetitions )
 supResults = performSupervised( argumentList[1], extTest, repetitions )
 
 #	print confusion matrices for both
-print( "Confusion matrix over " + repetitions +
+print( "Confusion matrix over " + str(repetitions) +
 	" repetitions for SUPERVISED learning:" )
 printList( supResults )
 print "\n"
@@ -811,9 +942,8 @@ print "\n"
 (diag, summed) = getStatistics( supResults )
 print( str(diag) + " instances out of " + str(summed) + " instances were " +
 	"predicted correctly in SUPERVISED learning." )
-(diag, summed) = getStatistics( semisupResults )
-print( str(diag) + " instances out of " + str(summed) + " instances were " +
+(diago, summedo) = getStatistics( semisupResults )
+print( str(diago) + " instances out of " + str(summedo) + " instances were " +
 	"predicted correctly in SEMI-SUPERVISED learning." )
 
-#	if theres enough time implement multilabel with 1 label at time using reformdata.py
-#	from your last project
+#if theres enough time implement multi-label with 1 label at time using "reform-data.python" from your last project
