@@ -26,7 +26,7 @@
 % Title
 \HRule \\[0.4cm]
 { \huge \bfseries \emph{Semi-supervised} learning problem.\\
-	Comprehensive introduction to the \colorbox{magenta}{problem} for everyone with real life application. \\[0.4cm] }
+	Comprehensive introduction to the semi-supervised learning with real life application. \\[0.4cm] }
 \HRule \\[1.5cm]
 
 % Author and supervisor
@@ -52,7 +52,7 @@ Peter \textsc{\textbf{Flach}}
 \end{titlepage}
 
 \begin{abstract}
-This dissertation consists of two chapters. First one is a general introduction to theory underlying...
+This study aims to present an overview of semi-supervised learning. First part of this paper provides a general introduction to the concept of semi-supervised learning and present a variety of methods and models, their advantages and disadvantages as well as to compare the performance of classification compared to supervised and unsupervised learning methods.
 \begin{center}
 Keywords: \textbf{semi-supervised, learning...}
 \end{center}
@@ -63,13 +63,19 @@ Keywords: \textbf{semi-supervised, learning...}
 \tableofcontents
 \newpage
 
-\chapter{Theory behind...}
+\chapter{Overview of semi-supervised learning}
+\section{Introduction}
+Usually students taking a machine learning course would be familiar with two main approaches to machine learning. First one is \textit{supervised learning}. Given a set of training data and a classification method we try to predict classes of unseen and unlabelled instances. 
 
+The latter approach, \textit{unsupervised learning} or \textit{clustering}, does not use a labelled set of instances for training purposes and we try to "guess" classes of instances of our data using a variety of methods. 
 
-\section{Background}
+However, there are situations when we only have a very limited set of training instances (e.g. due to labelling being very expensive for any reason). If we use classical algorithms involving training, we may not achieve very good results due to limited number of training instances. On the other hand, if we use a clustering method, then we do not take any advantage of having already labelled instances.
 
+\textit{Semi-supervised learning}, is in fact a missing link between these two approaches. Having a limited training set we aim to accurately predict correct classes for unseen data. In this work we would like to explain in details what semi-supervised methods is, what different approaches are and compare it with other available techniques by providing an example of application.
 
-\section{Applications}
+\section{Definition of semi-supervised learning}
+ 
+ 
  
 \section{Terminology}
 
