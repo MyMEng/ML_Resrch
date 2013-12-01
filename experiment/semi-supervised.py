@@ -31,14 +31,14 @@ J482a = "weka.classifiers.trees.J48 -p 1 "
 J482b = J481b
 #	SMO-Poly
 SMOP1a = "weka.classifiers.functions.SMO -v -o -s "
-SMOP1b = ( " -C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.functions." +
-	"supportVector.PolyKernel -C 250007 -E 1.0\"" )
+SMOP1b = ( " -C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka." +
+	"classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\"" )
 SMOP2a = "weka.classifiers.functions.SMO -p 1 "
 SMOP2b = SMOP1b
 #	SMO-RBF
 SMOR1a = "weka.classifiers.functions.SMO -v -o -s "
-SMOR1b = ( " -C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.functions.supportVector." +
-	"RBFKernel -C 250007 -G 0.01\"" )
+SMOR1b = ( " -C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka." +
+	"classifiers.functions.supportVector.RBFKernel -C 250007 -G 0.01\"" )
 SMOR2a = "weka.classifiers.functions.SMO -p 1 "
 SMOR2b = SMOR1b
 #	IBk
@@ -787,6 +787,45 @@ def getStatistics( mx ) :
 #
 #
 ################################################################################
+################################################################################
+# from multi-label file create single label file of selected index
+#
+#
+def partialFile( orgFile, singleLabel, noLabels, allAtributesNo ) :
+	newFile = ( orgFile[0:-5] + "_SL.arff" )
+	IDrange = ( "\"first-" + str(allAtributesNo - noLabels) + ", " +
+		str(allAtributesNo - singleLabel ) + "\"" )
+	clas = subprocess.Popen( weka + removeFilter1 + IDrange + " -V " +
+		removeFilter2 +	orgFile + removeFilter3 + newFile,
+		stdout=subprocess.PIPE, shell=True )
+	(out, err) = clas.communicate()
+	if err!=None:
+		print "Error while removing labels:\n" + err
+		exit()
+	return newFile
+#
+#
+#
+################################################################################
+################################################################################
+# accumulate two confusion matrices by pairwise summation
+#
+#
+def accumulateLists( cumulative, results ) :
+	# if cumulative empty it's firs iteration so copy
+	if not cumulative :
+		cumulative = results[:]
+	# else add up
+	else :
+		for i in range(len(cumulative)) :
+			for j in range(len(cumulative[i])) :
+				cumulative[i][j] += results[i][j]
+
+	return cumulative
+#
+#
+#
+################################################################################
 
 
 # main program
@@ -834,158 +873,213 @@ while not noLabelsUsr :
 		print 'Invalid Number. For YES write \'y\' and confirm with \'return\'.'
 		noLabelsUsr = None
 
-#	put ID as a first element of data
-IDdata(argumentList[1])
+#	count number of all attributes
+allAtributes = None
+if noLabels != 1 :
+	(empty, empty, data) = handleInstances(list(open(argumentList[1])))
+	allAtributes = countAtributes(data)
 
-#	open file with IDs
-rawFile = open(argumentList[1][0:-5] + "_ID.arff", 'r')
-fileList = list(rawFile)
+#
+## TAG-A
+#
+cumulativeSemisup = []
+cumulativeSup = []
+cumulativeRepetitions = 0
+#	multi-label edition with 1 label at a time using
+#	if more than one label to predict for each label create a separate single
+#	class file classify it and repeat for each file adding up scores
+for singleLabel in range(noLabels):
+	if noLabels == 1 :
+		argumentFilename = argumentList[1]
+	else :
+		# create first file
+		print( "\n\nDoing " + str(singleLabel+1) + " out of " + str(noLabels) +
+			" labels." )
+		argumentFilename = partialFile( argumentList[1], singleLabel, noLabels,
+			allAtributes )
 
-#	count the number of instances and get data list and header list
-(noInstances, arffHeader, data) = handleInstances(fileList)
+	#	put ID as a first element of data
+	IDdata(argumentFilename)
 
-#	count number of attributes
-noAtributes = countAtributes(data)
+	#	open file with IDs
+	rawFile = open(argumentFilename[0:-5] + "_ID.arff", 'r')
+	fileList = list(rawFile)
 
-#	extract values of attribute to predict
-targetClasses = extractTargets( arffHeader )
+	#	count the number of instances and get data list and header list
+	(noInstances, arffHeader, data) = handleInstances(fileList)
 
-#	remove the ground truth for labels
-IDrangeRm = ( str(noAtributes-noLabels+1) + "-" + str(noAtributes) )
-rmAttributes(argumentList[1], IDrangeRm)
+	#	count number of attributes
+	noAtributes = countAtributes(data)
 
-#	get list of data instances with removed ground truth
-rawFileUnlabeled = open(argumentList[1][0:-5] + "_unlabeled.arff", 'r')
-fileUnlabeled = list(rawFileUnlabeled)
-(empty, unlabeledArffHeader, unlabeledData) = handleInstances( fileUnlabeled )
+	#	extract values of attribute to predict
+	targetClasses = extractTargets( arffHeader )
 
-#	ask how many to use for supervised learning
-sup = None
-while not sup :
-	try:
-		sup = int( raw_input( "How many out of " + str(noInstances) +
-			" instances do you want to use for " + "supervised learning?: " ) )
-	except ValueError:
-		print 'Invalid Number'
+	#	remove the ground truth for labels
+	IDrangeRm = ( str(noAtributes-noLabels+1) + "-" + str(noAtributes) )
+	rmAttributes(argumentFilename, IDrangeRm)
 
-#	Give a list of indexes to use for supervised learning
-supIndexes = supIndex( sup, noInstances )
+	#	get list of data instances with removed ground truth
+	rawFileUnlabeled = open(argumentFilename[0:-5] + "_unlabeled.arff", 'r')
+	fileUnlabeled = list(rawFileUnlabeled)
+	(empty, unlabeledArffHeader, unlabeledData) = handleInstances( fileUnlabeled )
 
-#	whether to make next iteration
-cont = True
-while cont :
-	# 1
-	#	extract supIndexes and write to arff file
-	(Training, Test) = createTT(supIndexes, data, targetClasses)
-	(empty, unlabeledTest) = createTT(supIndexes, unlabeledData, targetClasses)
-
-	#	convert lists to arff files and write set_training.arff and
-	#	set_test.arff rmLabels decides whether to use labeled data or unlabeled
-	#	as test set
-	rmLabels = False # True
-	saveToarff(argumentList[1], arffHeader, unlabeledArffHeader, Training, Test,
-		unlabeledTest, rmLabels)
-
-	cont = True
-	#	train classifiers on initial train set with mentioned schemes and test
-	#	(predict) on rest and return raw outputs
-	( rawIBk, rawJ48, rawSMOP, rawSMOR ) = trainClassifier(argumentList[1])
-
-	#	make sens of outputs
-	( IBk, J48, SMOP, SMOR ) = extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR )
-
-	#	check matching predictions
-	( predictionQnt, predictionInd, predictionClass ) = matchPredictions( IBk,
-		J48, SMOP, SMOR )
-
-	#	ask for numbers of samples to to add and boost classifier
-	boostNums = None
-	boostNum = 0
-	while not boostNums :
+	#	ask how many to use for supervised learning
+	sup = None
+	while not sup :
 		try:
-			# give current statistics
-			print( "========================================" +
-				"========================================" )
-			print( "There are: " + str(predictionQnt[0]) + " instances that agree" +
-				" in all 4 classifiers." )
-			print( "There are: " + str(predictionQnt[1]) + " instances that agree" +
-				" in 3 out of 4 classifiers." )
-			print( "There are: " + str(predictionQnt[2]) + " instances that agree" +
-				" in 2 out of 4 classifiers." )
-			print( "There are: " + str(predictionQnt[3]) + " instances that agree" +
-				" in non of classifiers." )
-			print( "Priority in choosing instances for boost operation is given " +
-				"to ones that agrees in most of classifiers." )
-			print( "========================================" +
-				"========================================\n" )
+			sup = int( raw_input( "How many out of " + str(noInstances) +
+				" instances do you want to use for " + "supervised learning?: " ) )
+		except ValueError:
+			print 'Invalid Number'
 
-			boostNums = raw_input( "How many out of " +
-				str(noInstances-len(supIndexes)) + " instances do you want to" +
-				" use to boost classifier?\nIf you want to stop boosting " +
-				"operation and check accuracy of classifier put letter [s]: " )
+	#	Give a list of indexes to use for supervised learning
+	supIndexes = supIndex( sup, noInstances )
 
-			# if user put 's' stop boosting
-			if boostNums == 's' :
-				# go to 'cross-validating' classifier
-				cont = False
-				continue
+	#	whether to make next iteration
+	cont = True
+	while cont :
+		# 1
+		#	extract supIndexes and write to arff file
+		(Training, Test) = createTT(supIndexes, data, targetClasses)
+		(empty, unlabeledTest) = createTT(supIndexes, unlabeledData, targetClasses)
 
-			boostNum = int( boostNums )
+		#	convert lists to arff files and write set_training.arff and
+		#	set_test.arff rmLabels decides whether to use labeled data or unlabeled
+		#	as test set
+		rmLabels = False # True
+		saveToarff(argumentFilename, arffHeader, unlabeledArffHeader, Training, Test,
+			unlabeledTest, rmLabels)
 
-			# number must be greater than 0
-			if boostNum <= 0 :
-				print "Number must be greater than 0!"
+		cont = True
+		#	train classifiers on initial train set with mentioned schemes and test
+		#	(predict) on rest and return raw outputs
+		( rawIBk, rawJ48, rawSMOP, rawSMOR ) = trainClassifier(argumentFilename)
+
+		#	make sens of outputs
+		( IBk, J48, SMOP, SMOR ) = extractOutput( rawIBk, rawJ48, rawSMOP, rawSMOR )
+
+		#	check matching predictions
+		( predictionQnt, predictionInd, predictionClass ) = matchPredictions( IBk,
+			J48, SMOP, SMOR )
+
+		#	ask for numbers of samples to to add and boost classifier
+		boostNums = None
+		boostNum = 0
+		priorityNum = None
+		while ( (not boostNums) and (not priorityNum) ) :
+			try:
+				# give current statistics
+				print( "========================================" +
+					"========================================" )
+				print( "There are: " + str(predictionQnt[0]) + " instances that " +
+					"agree in all 4 classifiers." )
+				print( "There are: " + str(predictionQnt[1]) + " instances that " +
+					"agree in 3 out of 4 classifiers." )
+				print( "There are: " + str(predictionQnt[2]) + " instances that " +
+					"agree in 2 out of 4 classifiers." )
+				print( "There are: " + str(predictionQnt[3]) + " instances that " +
+					"agree in non of classifiers." )
+				print( "Priority in choosing instances for boost operation is " +
+					"given to ones that agrees in most of classifiers." )
+				print( "========================================" +
+					"========================================\n" )
+
+				boostNums = raw_input( "How many out of " +
+					str(noInstances-len(supIndexes)) + " instances do you want to" +
+					" use to boost classifier?\nIf you want to stop boosting " +
+					"operation and check accuracy of classifier put letter [s]: " )
+
+				# if user put 's' stop boosting
+				if boostNums == 's' :
+					# go to 'cross-validating' classifier
+					cont = False
+					continue
+
+
+				priorityNum = raw_input( "Give priority to [A]:4/4 | [B]: 3/4 | " +
+					"[C]: 2/4 ?: " )
+				# check if priorityNum is one of 'A', 'B' or 'C'
+				if priorityNum != ( 'A' or 'B' or 'C' ) :
+					print "Priority must be either of: 'A', 'B' or 'C'."
+					priorityNum = None
+
+				boostNum = int( boostNums )
+
+				# number must be greater than 0
+				if boostNum <= 0 :
+					print "Number must be greater than 0!"
+					boostNums = None
+
+			except ValueError:
+				print 'Invalid Number. I you want to stop put [s].'
 				boostNums = None
 
+		#	rebuilt classifier with # of samples defined by user choosing all
+		#	instances where majority of classifiers agrees boils down to rebuilding
+		# datasets and going back to stage #1
+		if cont :
+			# change order of classification
+			if priorityNum == 'A' :
+				pass
+			elif priorityNum == 'B' :
+				# i[b], i[a] = i[a], i[b]
+				predictionInd[0], predictionInd[1] = predictionInd[1], 
+				predictionInd[0]
+				predistionClass[0], predistionClass[1] = predistionClass[1], 
+				predistionClass[0]
+			elif priorityNum == 'C' :
+				predictionInd[0], predictionInd[1], predictionInd[2] = predictionInd[2], predictionInd[0], predictionInd[1]
+				predistionClass[0], predistionClass[1], predistionClass[2] = predistionClass[2], predistionClass[0], predistionClass[1]
+			else :
+				print "Unknown order assuming [A]."
+
+			supIndexes = rebuildSets( boostNum, predictionInd, predictionClass,
+				supIndexes )
+
+
+	#	then perform n-times with each of classifiers with cross validation
+	#	to compare accuracy of results
+	repetitions = None
+	while not repetitions :
+		try:
+			repetitions = int( raw_input( "How many times do you want to perform " +
+				"tests with c-v of supervised learning?: " ) )
+			if repetitions <= 0 :
+				repetitions = None
+				print "Number must be greater than 0."
 		except ValueError:
-			print 'Invalid Number. I you want to stop put [s].'
-			boostNums = None
+			print 'Invalid Number'
 
-	#	rebuilt classifier with # of samples defined by user choosing all instances
-	#	where majority of classifiers agrees boils down to rebuilding datasets and
-	#	going back to stage #1
-	if cont :
-		# ERROR - powinie??nes doczepiac instance z przewidziana klasa a ine z trew klasa
-		supIndexes = rebuildSets( boostNum, predictionInd, predictionClass,
-			supIndexes )
+	#	ask for external test set if not supplied use whole set and cross-validation
+	extTest = str( raw_input( "Please give name of external test file. If you " +
+		"don't have one c-v will be performed on whole data set; in this case " +
+		" type [none]: " ) )
 
+	#	check accuracy of created data set
+	semisupResults = performSemiSupervised( argumentFilename, extTest, repetitions )
+	cumulativeSemisup = accumulateLists(cumulativeSemisup, semisupResults)
+	supResults = performSupervised( argumentFilename, extTest, repetitions )
+	cumulativeSup = accumulateLists(cumulativeSup, supResults)
 
-#	then perform n-times with each of classifiers with cross validation
-#	to compare accuracy of results
-repetitions = None
-while not repetitions :
-	try:
-		repetitions = int( raw_input( "How many times do you want to perform " +
-			"tests with c-v of supervised learning?: " ) )
-		if repetitions <= 0 :
-			repetitions = None
-			print "Number must be greater than 0."
-	except ValueError:
-		print 'Invalid Number'
+	#	accumulate repetitions
+	cumulativeRepetitions += repetitions
 
-#	ask for external test set if not supplied use whole set and cross-validation
-extTest = str( raw_input( "Please give name of external test file. If you " +
-	"don't have one c-v will be performed on whole data set; in this case " +
-	" type [none]: " ) )
-
-#	check accuracy of created data set
-semisupResults = performSemiSupervised( argumentList[1], extTest, repetitions )
-supResults = performSupervised( argumentList[1], extTest, repetitions )
+#
+## TAG-B
+#
 
 #	print confusion matrices for both
-print( "Confusion matrix over " + str(repetitions) +
+print( "Confusion matrix over " + str(cumulativeRepetitions) +
 	" repetitions for SUPERVISED learning:" )
-printList( supResults )
+printList( cumulativeSup )
 print "\n"
 print( "Confusion matrix for SEMI-SUPERVISED learning (each value multiplied " +
 	" by number of repetitions):" )
-printList( semisupResults )
+printList( cumulativeSemisup )
 print "\n"
-(diag, summed) = getStatistics( supResults )
+(diag, summed) = getStatistics( cumulativeSup )
 print( str(diag) + " instances out of " + str(summed) + " instances were " +
 	"predicted correctly in SUPERVISED learning." )
-(diago, summedo) = getStatistics( semisupResults )
+(diago, summedo) = getStatistics( cumulativeSemisup )
 print( str(diago) + " instances out of " + str(summedo) + " instances were " +
 	"predicted correctly in SEMI-SUPERVISED learning." )
-
-#if theres enough time implement multi-label with 1 label at time using "reform-data.python" from your last project
