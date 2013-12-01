@@ -176,7 +176,32 @@ def supIndex(noToExtract, noInstances) :
 			lock += 1
 			r = randint(0, noInstances - 1)
 		remove.append(r)
-	return remove
+
+		# zip remove with bunch of 0 - zero means the class was given in super
+		zeros = len(remove) * [0]
+		removeZip = zip(remove, zeros)
+
+	return removeZip
+#
+#
+#
+################################################################################
+################################################################################
+# extract values of attribute to predict
+#
+#
+def extractTargets( arffHeader ) :
+	targetClasses = [ "ORIGINAL" ]
+	# find last attribute
+	for line in reversed(arffHeader) :
+		if "@attribute" in line :
+			# get last element of line which is classes, without brackets,
+			#	and split on commas
+			for name in (line.split()[-1][1:-1]).split(',') :
+				targetClasses.append(name)
+			break
+
+	return targetClasses
 #
 #
 #
@@ -185,19 +210,29 @@ def supIndex(noToExtract, noInstances) :
 # generate 2 lists: one containing training(labeled) instances and the other
 # list of instances to instances to improve a classifier
 #
-def createTT(removeInd, instances) :
+def createTT(removeInd, instances, targetClasses) :
 	rm = removeInd[:]
 	test = []
 	training = []
 
 	for ind, val in enumerate(instances):
 		# instance with ground-truth
-		if ind in rm :
+		if i = [j for j, x in enumerate(rm) if x[0] == ind] :
+		# if ind in rm :
+			# edit value bu putting predicted class at the end
+			# if 0 "ORIGINAL" encountered don't alter class with ground truth
+			if removeInd[i][1] != 0 :
+				lineList ("".join(val.split())).split(',')
+				lineList[-1] = targetClasses[removeInd[i][1]]
+				value = ','.join(lineList)
+			else :
+				value = val
 			# append element to training
-			training.append(val)
+			training.append(value)
 			# remove ind element
-			rm.remove(ind)
+			rm.remove(removeInd[i[0]])
 			continue
+		# else append to test
 		test.append(val)
 
 	if not rm :
@@ -494,29 +529,31 @@ def matchPredictions( IBk, J48, SMOP, SMOR ) :
 def rebuildSets( boostNum, predictionInd, predictionClass, supIndexes ) :
 	bnt = boostNum
 	runOutOfIndexes = False
-	temp = []
-
-	# [pair]
+	tempInd = []
+	tempClass = []
 
 	# start emptying the first list
-	for ie in predictionInd:
-		for je in ie :
+	for i in range( len( predictionInd ) ) :
+		for j in range( len( predictionInd[i] ) ) :
 			if bnt <= 0 :
 				runOutOfIndexes = True
 				break
 			# convert ID to index (subtract 1). Later starts from 0 ID from 1
-			temp.append(je-1)
+			tempInd.append( predictionInd[i][j] - 1 )
+			tempClass.append( predictionClass[i][j] )
 			bnt -= 1
 		if runOutOfIndexes :
 			break
 
+	# zip ind with class
+	temp = zip( tempInd, tempClass )
 	# merge lists
-	supIndexes += temp
+	supIndexes += tempInd
 	# sort indexes
-	supIndexes.sort()
+	supIndexes.sort(key=lambda tup: tup[0])
 
 	# 0 in supClasses means original class
-	return ( supIndexes, supClasses )
+	return supIndexes
 #
 #
 #
@@ -808,6 +845,9 @@ fileList = list(rawFile)
 #	count number of attributes
 noAtributes = countAtributes(data)
 
+#	extract values of attribute to predict
+targetClasses = extractTargets( arffHeader )
+
 #	remove the ground truth for labels
 IDrangeRm = ( str(noAtributes-noLabels+1) + "-" + str(noAtributes) )
 rmAttributes(argumentList[1], IDrangeRm)
@@ -834,8 +874,8 @@ cont = True
 while cont :
 	# 1
 	#	extract supIndexes and write to arff file
-	(Training, Test) = createTT(supIndexes, data)
-	(empty, unlabeledTest) = createTT(supIndexes, unlabeledData)
+	(Training, Test) = createTT(supIndexes, data, targetClasses)
+	(empty, unlabeledTest) = createTT(supIndexes, unlabeledData, targetClasses)
 
 	#	convert lists to arff files and write set_training.arff and
 	#	set_test.arff rmLabels decides whether to use labeled data or unlabeled
