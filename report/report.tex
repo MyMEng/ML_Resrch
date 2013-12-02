@@ -67,30 +67,59 @@ Keywords: \textbf{semi-supervised, learning...}
 \section{Introduction}
 Usually students taking a machine learning course would be familiar with two main approaches to machine learning. First one is \textit{supervised learning}. Given a set of training data and a classification method we try to predict classes of unseen and unlabelled instances. 
 
-The latter approach, \textit{unsupervised learning} or \textit{clustering}, does not use a labelled set of instances for training purposes and we try to "guess" classes of instances of our data using a variety of methods. 
+The latter approach, \textit{unsupervised learning}, does not use a labelled set of instances for training purposes or any other apriori knowledge about the data. A common task of this method is \textit{clustering}. We try to "guess" classes our data using a variety of methods and assign unlabelled instances into correct clusters.
 
 However, there are situations when we only have a very limited set of training instances (e.g. due to labelling being very expensive for any reason). If we use classical algorithms involving training, we may not achieve very good results due to limited number of training instances. On the other hand, if we use a clustering method, then we do not take any advantage of having already labelled instances.
 
 \textit{Semi-supervised learning}, is in fact a missing link between these two approaches. Having a limited training set we aim to accurately predict correct classes for unseen data. In this work we would like to explain in details what semi-supervised methods is, what different approaches are and compare it with other available techniques by providing an example of application.
 
 \section{Definition of semi-supervised learning}
+In this work we would like to focus on one particular task of semi supervised classification, which builds on top of classical supervised classification task. There are also other settings, such as semi-supervised clustering or dimensionality reductions which are covered in depth by works from other authors.
+
+In semi-supervised classification we aim to find a function $ f $ that will predict classes of unlabelled data with better accuracy than supervised technique using only a very small training set. We extend training set $ X $ so that it contains both kinds of data. In other words, $ X = L \cup U $, where $ L $ is a set of $ n $ instances (denoted by $ x $) with corresponding labels (denoted by $ y $): $ L = \{ (x_1, y_1), (x_2, y_2), ..., (x_n, y_n)\} $ and $ U $ is the set of $ m $ unlabelled data points: $ U = \{ x_{n+1}, x_{n+2}, ..., x_{n+m}\} $. Also, let's call set of $n$ labels or classes only: $ Y = \{ y_1, y_2, ..., y_n \} $
+
+In sections below we would like to define certain assumptions of semi-supervised learning.
+
+\subsection{Inductive and transductive learning}
+Partially-supervised learning presents two different approaches to learning: inductive and transductive\cite{chapelle06}. 
+
+Inductive approach involves using a mixture or labelled and unlabelled data to classify an unseen test set of unlabelled instances. In other words we try to find a function: $ f: X_{test} \to Y $ where $ X_{test} $ contains unlabelled points beyond provided training set, i.e. $ X_{test} = \{ x_l, x_{l+1}, ..., x_{k} \} $ where $ k > l > n+m $.
+
+In the latter approach, we focus on classifying data within the training sample. Hence our goal is to classify available unlabelled data deal rather than an external test dataset. Again we can express this as a function: $ f: X_{test} \to Y $, but now $ X_{test} $ contains unlabelled points provided in training set, i.e. $ X_{test} = \{ x_n, x_{n+1}, ..., x_{m} \} $.
+
+
+
+\subsection{Smoothness assumption}
+
+Semi-supervised learning assumes smoothness prior for its inputs and outputs\cite{chapelle06}. For instance, in image processing a general smoothness prior assumes that in a given space output changes in a smooth way over distance or time\cite{stan95}. Similarly in machine learning, labels tend to change smoothly over the space. Under assumptions of semi-supervised learning we extend this generalisation to include information about smoothness of inputs. We assume that for two given inputs $ x_1, x_2 $ in the distance between corresponding labels $ l_1, l_2 $ will be smaller if the inputs are in a high density region, but the labels might be separated further away from each other when inputs are placed in lower density cluster.
+
+\subsection{Cluster assumption}
+
+Another assumption we make about the data is that we believe that points tend to form clusters. Furthermore, we assume that if given two points $ x_1, x_2 $ are geometrically within the same cluster, they would share the same class\cite{chapelle06}.
+
+This assumption is rather intuitive -  if data of same class tends to form clusters it is unlikely that a point of a different class will be placed in a "wrong" cluster. Although it is still possible, this generalisation allows us to look at the structure of unlabelled data points and use observation in semi-supervised learning algorithms.
+
+\subsection{Manifold assumption}
  
+When performing classification tasks, one of the big problems is data dimensionality. E.g. let's imagine we trained a spam filter that would estimate likelihood of e-mail being spam and non-spam based on certain keywords. In this example each keyword added to the classifier adds another dimension. 
+
+Having many dimensions is a problem known as \textit{curse of dimensionality}\cite{chapelle06}. Both data size grows exponentially with features added, but also correlation between features varies and it becomes harder to find a good estimations for classes. The manifold assumption states that high dimensional data lies on a low-dimensional manifold. What it means is that we may try to reduce number of features used in learning by selecting only features correlated, while we maintain good performance of the classifier. 
+
  
- 
-\section{Terminology}
+\section{Models}
+\subsection{Generative model}
+\subsection{Low-density separation}
+\subsection{Graph based method}
 
-
-\section{General assumptions}
-
-
-
-
+\section{Applications of semi-supervised learning}
 \chapter{Practical application}
+
+
+\bibliography{references}{}
 
 \newpage
 \begin{center} \textbf{\huge \vspace{15pt} FIN} \end{center}
 
-\bibliography{ref}{}
 \bibliographystyle{plain}
 
 \end{document}
