@@ -4,9 +4,10 @@ import sys
 import subprocess
 from random import randint
 from random import choice
+from shutil import copy
+# import os
 # import numpy as np
 # import section
-# import os
 # import pickle
 
 
@@ -250,7 +251,7 @@ def createTT(removeInd, instances, targetClasses) :
 #
 #
 def saveToarff(fileName, arffHeader, unlabeledArffHeader, Training, Test,
-	unlabeledTest, removeLabels) :
+	unlabeledTest, removeLabels, noSuper) :
 	# open two files to write
 	testStream = open( fileName[0:-5]+"_unlabeledTest.arff", 'w')
 	trainingStream = open( fileName[0:-5]+"_labeledTraining.arff", 'w')
@@ -276,6 +277,21 @@ def saveToarff(fileName, arffHeader, unlabeledArffHeader, Training, Test,
 	else :
 		for i in Test :
 			testStream.write(i)
+
+	testStream.close()
+	trainingStream.close()
+
+	# if it's set containing only of randomly chosen instances(first iteration)
+	#	make a copy for supervised learning on small set statistics
+	if noSuper == len(Training) :
+		# shutil.copy(src, dst)
+		print( "cp " + fileName[0:-5] + "_labeledTraining.arff " +
+			fileName[0:-5] + "_initial.arff" )
+		err = copy( fileName[0:-5] + "_labeledTraining.arff", 
+			fileName[0:-5] + "_initial.arff" )
+		if err :
+			print "Could not make a copy of original file:\n" + err
+			exit()
 #
 #
 #
@@ -687,6 +703,12 @@ def performSupervised( fileName, extTest, n ) :
 		IDdata(extTest)
 		testOnMe = ( testSwitch + extTest[0:-5] + "_ID.arff" )
 
+	# do full set training or only firstly selected training
+	if "init" in fileName :
+		trainOnMe = ( fileName[0:-5] + "_initial.arff" )
+	else :
+		trainOnMe = ( fileName[0:-5] + "_ID.arff" )
+
 	# take a random seed
 	r = 0
 
@@ -698,7 +720,7 @@ def performSupervised( fileName, extTest, n ) :
 		# classify with IBk
 		r = randint(1, 1000000)
 		clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
-			IBk1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+			IBk1a + str(r) + trainingSwitch + trainOnMe + 
 			testOnMe + meta3 + IBk1b, stdout=subprocess.PIPE, shell=True )
 		(out, err) = clas.communicate()
 		tempConf.append(out)
@@ -709,7 +731,7 @@ def performSupervised( fileName, extTest, n ) :
 		# classify with J48
 		r = randint(1, 1000000)
 		clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
-			J481a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+			J481a + str(r) + trainingSwitch + trainOnMe + 
 			testOnMe + meta3 + J481b, stdout=subprocess.PIPE, shell=True )
 		(out, err) = clas.communicate()
 		tempConf.append(out)
@@ -720,7 +742,7 @@ def performSupervised( fileName, extTest, n ) :
 		# classify with SMO-Poly
 		r = randint(1, 1000000)
 		clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
-			SMOP1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+			SMOP1a + str(r) + trainingSwitch + trainOnMe + 
 			testOnMe + meta3 + SMOP1b, stdout=subprocess.PIPE, shell=True )
 		(out, err) = clas.communicate()
 		tempConf.append(out)
@@ -731,7 +753,7 @@ def performSupervised( fileName, extTest, n ) :
 		# classify with SMO-RBF
 		r = randint(1, 1000000)
 		clas = subprocess.Popen( weka + meta1 + removeFilter1 + str(1) + meta2 +
-			SMOR1a + str(r) + trainingSwitch + fileName[0:-5] + "_ID.arff" + 
+			SMOR1a + str(r) + trainingSwitch + trainOnMe + 
 			testOnMe + meta3 + SMOR1b, stdout=subprocess.PIPE, shell=True )
 		(out, err) = clas.communicate()
 		tempConf.append(out)
@@ -884,6 +906,7 @@ if noLabels != 1 :
 #
 cumulativeSemisup = []
 cumulativeSup = []
+cumulativeInitialSup = []
 cumulativeRepetitions = 0
 #	multi-label edition with 1 label at a time using
 #	if more than one label to predict for each label create a separate single
@@ -948,7 +971,7 @@ for singleLabel in range(noLabels):
 		#	as test set
 		rmLabels = False # True
 		saveToarff(argumentFilename, arffHeader, unlabeledArffHeader, Training, Test,
-			unlabeledTest, rmLabels)
+			unlabeledTest, rmLabels, sup)
 
 		cont = True
 		#	train classifiers on initial train set with mentioned schemes and test
@@ -996,10 +1019,12 @@ for singleLabel in range(noLabels):
 					continue
 
 
-				priorityNum = raw_input( "Give priority to [A]:4/4 | [B]: 3/4 | " +
-					"[C]: 2/4 ?: " )
+				priorityNum = str( raw_input( "Give priority to [A]:4/4 | [B]: 3/4 | " +
+					"[C]: 2/4 ?: " ) )
+				print priorityNum
 				# check if priorityNum is one of 'A', 'B' or 'C'
-				if priorityNum != ( 'A' or 'B' or 'C' ) :
+				if not( ( priorityNum ==  'A' ) or ( priorityNum ==  'B' ) or
+					( priorityNum ==  'C' ) ) :
 					print "Priority must be either of: 'A', 'B' or 'C'."
 					priorityNum = None
 
@@ -1023,13 +1048,11 @@ for singleLabel in range(noLabels):
 				pass
 			elif priorityNum == 'B' :
 				# i[b], i[a] = i[a], i[b]
-				predictionInd[0], predictionInd[1] = predictionInd[1], 
-				predictionInd[0]
-				predistionClass[0], predistionClass[1] = predistionClass[1], 
-				predistionClass[0]
+				predictionInd[0], predictionInd[1] = predictionInd[1], predictionInd[0]
+				predictionClass[0], predictionClass[1] = predictionClass[1], predictionClass[0]
 			elif priorityNum == 'C' :
 				predictionInd[0], predictionInd[1], predictionInd[2] = predictionInd[2], predictionInd[0], predictionInd[1]
-				predistionClass[0], predistionClass[1], predistionClass[2] = predistionClass[2], predistionClass[0], predistionClass[1]
+				predictionClass[0], predictionClass[1], predictionClass[2] = predictionClass[2], predictionClass[0], predictionClass[1]
 			else :
 				print "Unknown order assuming [A]."
 
@@ -1061,6 +1084,12 @@ for singleLabel in range(noLabels):
 	supResults = performSupervised( argumentFilename, extTest, repetitions )
 	cumulativeSup = accumulateLists(cumulativeSup, supResults)
 
+	#	perform supervised on first selected elements in first iteration
+	supInitialResults = performSupervised( (argumentFilename[0:-5] + ".init"),
+		extTest, repetitions )
+	cumulativeInitialSup = accumulateLists(cumulativeInitialSup,
+		supInitialResults)
+
 	#	accumulate repetitions
 	cumulativeRepetitions += repetitions
 
@@ -1070,8 +1099,12 @@ for singleLabel in range(noLabels):
 
 #	print confusion matrices for both
 print( "Confusion matrix over " + str(cumulativeRepetitions) +
-	" repetitions for SUPERVISED learning:" )
+	" repetitions for SUPERVISED learning for full set:" )
 printList( cumulativeSup )
+print "\n"
+print( "Confusion matrix over " + str(cumulativeRepetitions) +
+	" repetitions for SUPERVISED learning for initial semi-sup set:" )
+printList( cumulativeInitialSup )
 print "\n"
 print( "Confusion matrix for SEMI-SUPERVISED learning (each value multiplied " +
 	" by number of repetitions):" )
@@ -1079,7 +1112,10 @@ printList( cumulativeSemisup )
 print "\n"
 (diag, summed) = getStatistics( cumulativeSup )
 print( str(diag) + " instances out of " + str(summed) + " instances were " +
-	"predicted correctly in SUPERVISED learning." )
+	"predicted correctly in SUPERVISED learning with full set." )
+(diag, summed) = getStatistics( cumulativeInitialSup )
+print( str(diag) + " instances out of " + str(summed) + " instances were " +
+	"predicted correctly in SUPERVISED learning with initial semi-sup set." )
 (diago, summedo) = getStatistics( cumulativeSemisup )
 print( str(diago) + " instances out of " + str(summedo) + " instances were " +
 	"predicted correctly in SEMI-SUPERVISED learning." )
