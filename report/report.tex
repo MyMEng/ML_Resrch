@@ -69,7 +69,7 @@ Usually students taking a machine learning course would be familiar with two mai
 
 The latter approach, \textit{unsupervised learning}, does not use a labelled set of instances for training purposes or any other apriori knowledge about the data. A common task of this method is \textit{clustering}. We try to "guess" classes our data using a variety of methods and assign unlabelled instances into correct clusters.
 
-However, there are situations when we only have a very limited set of training instances (e.g. due to labelling being very expensive for any reason). If we use classical algorithms involving training, we may not achieve very good results due to limited number of training instances. On the other hand, if we use a clustering method, then we do not take any advantage of having already labelled instances.
+However, in real life we more often find examples of data which is not labelled and manual labelling is requiring significant amount of labour and it is expensive\cite{Blum98, He07}. If we use classical algorithms involving training, we may not achieve very good results due to limited number of training instances. On the other hand, if we use a clustering method, then we do not take any advantage of having already labelled instances.
 
 \textit{Semi-supervised learning}, is in fact a missing link between these two approaches. Having a limited training set we aim to accurately predict correct classes for unseen data. In this work we would like to explain in details what semi-supervised methods is, what different approaches are and compare it with other available techniques by providing an example of application.
 
@@ -111,11 +111,26 @@ The literature describing SSL presents many models for classification algorithms
 
 \subsection{Generative models}
 
+Generative models, such as Naive Bays, work under the assumption that the data is distributed with the use of a probability density function. If we mixed two datasets and knew their distributions, we could tell separate them to their original classes. This is why generative models are also called mixture models\cite{Zhu06semi}.
+
+In context of SSL, we often assume that data follows Gaussian distribution and we use both labelled and unlabelled data points to estimate parameters of the distributions. In supervised learning, we would only use training instances and not having enough of these can results in skewed estimation of the parameters. In SSL we try to find an optimal values with help of unlabelled data. 
 
 \subsection{Low-density separation}
+
+
+
 \subsection{Graph based method}
 
+In graph based methods of semi-supervised learning, in order to classify the data we create an undirected graph $ G = (V, E) $. The set of nodes $ V $ contains both labelled and unlabelled instances. Edges of the graph, the set $ E $, are representing similarity between two connecting nodes, which can be expressed as weight $ w_{i,j} $ between two vertices $x_{i}, x_{j} $. Learning using graph methods involves assigning labels $ y $ to each node of the graph by examining the weights. Thanks to the smoothness assumption we might assume that if weight $ w_{i,j} $ is large, then two labels $ y_i, y_j $ will be the same. Since we provided small training data, there are nodes already having labels assigned, therefore we are able to classify all nodes in the graph\cite{Zhu06semi}.
+
+Many of the methods for building graphs and estimating weights are distance based, such as fully connected graph, kNN and $\epsilon$NN graphs\cite{Zhu06semi}. In fully connected graph we create edges between all pairs of vertices and we assign weights that are inversely proportional to the Euclidean distance between the nodes. Missing edge would represent an infinite weight\cite{chapelle06}. In kNN case, we only connect k nearest neighbours. $\epsilon$NN takes into account only pairs vertices $ x_i, x_j $ with distance $ \| x_i - x_j \| < \epsilon $.
+
+In contrast to distance based methods of building graphs, there are also proposed generative approaches that are claimed to be more effective for certain datasets than methods using discriminative approach\cite{He07}. Rather than calculating Euclidean distance, we estimate conditional probabilities of classes given data points and set them as weights between nodes. 
+
 \section{Applications of semi-supervised learning}
+
+
+
 \chapter{Practical application}
 
 
