@@ -1,1 +1,96 @@
-../synopsis/synopsis_content.tex
+% include a brief discussion about how the limitation of leaf instances affects the performance of the decision tree algorithm.
+
+% \documentclass[12pt,a4paper,twocolumn]{article}
+% \usepackage{times} % times font
+% \usepackage{mathptmx} % times font in maths
+% \usepackage{fullpage}
+% \usepackage[top=1in, bottom=1in, left=0.8in, right=0.8in]{geometry}
+% \usepackage{multirow} %in tables
+% \usepackage{caption} % in tables
+% \pagenumbering{gobble}
+% \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+% \usepackage[pdftex]{graphicx}
+% \usepackage{lipsum}
+
+% \usepackage{amsmath}
+% \usepackage{hyperref}
+% \usepackage{graphicx}
+% \usepackage{subfigure}
+% \usepackage{indentfirst} % indent frst paragraph of section
+
+% \usepackage[usenames,dvipsnames]{color}
+
+% \newcommand{\ts}{\textsuperscript}
+
+% \begin{document}
+
+\thispagestyle{empty}
+
+\newgeometry{top=1in, bottom=1in, left=0.8in, right=0.8in}
+
+\twocolumn[
+\begin{@twocolumnfalse}
+\begin{center}
+	\begin{large}
+	{\HRule \\[0.2cm]}
+	\textsc{Experimental approach to \textbf{semi-supervised} learning methods}
+	{\HRule \\[0.3cm]}
+	\end{large}
+
+	\begin{minipage}{ 0.41\textwidth }
+		\begin{flushleft}
+			Kacper \textbf{Sokol}--- \texttt{ks1591} --- 3GGK1\\
+			Maciej \textbf{Kumorek}--- \texttt{mk0934}--- 3G403\
+		\end{flushleft}
+	\end{minipage}
+	\begin{minipage}{ 0.41\textwidth }
+		\begin{flushright}
+			{COMS30301 $|$ Lab 4: Research project\\
+			Introduction to Machine Learning\\[0.3cm]}
+		\end{flushright}
+	\end{minipage}
+\end{center}
+\end{@twocolumnfalse}
+] % \lipsum[1]~\\[0.4cm]
+\section*{Summary}
+% A paragraph or two stating what the project is about.
+We aim to discuss current issues concerning freely available data on the Internet in a perspective of \emph{semi-supervised learning}. Nearly infinite amount of information that can be obtained from World Wide Web in uncountable fields of human life is at hand of researchers but majority of the data is useless for most of machine learning algorithms as they are not labeled with ground truth i.e.\ without prior slow and expensive process of manual labeling any supervised learning algorithm cannot be used to build a classifier. On contrary, this task could be handled by simpler unsupervised learning algorithms which group ``similar'' instances together, but because of worse performance and different application areas they perform poorly when used for label prediction.
+
+Due to high cost of labeled data, a new field of \emph{semi-supervised} learning emerged. In these algorithms only a small number of instances from a data set requires labeling by hand. Such data can be then used to build a simple classifier that will be reinforced in an iterative process of boosting it with data points that are believed to be labeled correctly using produced classification method.
+% We need data but not too mauch! --- Dimmensionality issue with huge number of data it is costly to label them all
+
+\section*{Aims and objectives}
+We would like to divide our project into two parts. Firstly, we will crate a summary that will be an introduction to semi-supervised learning. We are going to present drawbacks of supervised and unsupervised learning. Then we will focus on theory behind semi-supervised learning and review common paradigms.
+
+The second part will describe and present the results of an experiment that we will conduct with simple semi-supervised algorithms that we aim to build. To this end, we are going to use number of classifiers implemented in \texttt{WEKA} machine learning package to produce simple classification algorithms. Next step will be to find instances of unlabeled data that have been classified with the same label in all used classifiers. From this set we are aiming to choose a subset of most probable predictions i.e.\ the ones that are believed to have the correct class assigned.
+
+Finally, we will compare and evaluate the correctness of our classification method and a few of supervised learning algorithms under assumption of having all data points labeled with ground truth.
+
+% The aim of your project should be a broad statement of what you intend to achieve or the problem you intend to solve; objectives are derived from the broader aim and set the realistic targets to achieve during the project (try to make them SMART: Specific, Measurable, Realistic, Achievable and Timed).
+
+% lern different classifiers from labeled data
+% use n\% of instances that were correctly classified
+
+\section*{Deliverables}
+\begin{itemize}
+\item Literature survey of currently used semi-supervised learning algorithms.
+\item Basic analysis of the algorithms.
+\item Applications of such algorithms.
+% \item
+\vspace{30pt}
+\item Construction of simple semi-supervised learning algorithm.
+\item Comparison of accuracy between supervised and semi-supervised learning methods.
+\item Discussion of results collected.
+\item \textbf{\{}Stretch goal\textbf{\}} Producing additional semi-supervised classifiers for comparison purposes.\
+\end{itemize}
+
+% Here you should describe the concrete things you are going to produce in your project in order to achieve your aims and objectives: a literature survey, a demonstrator implementation, an experimental evaluation, etc.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% You should submit a report (starting with the agreed synopsis) and any code or data that you used in the project. For a literature review, the expectation is that this is 15-20 pages in length (10-15 pages if you're working on your own).
+% Your project will primarily be marked on the extent to which your report demonstrates a solid understanding of the machine learning techniques involved, how they relate to what was taught in the lectures, and how skillfully you apply them in the context of your chosen project topic.
+
+
+% \end{document}
