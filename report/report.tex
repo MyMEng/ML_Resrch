@@ -73,6 +73,11 @@ Keywords: \textbf{semi-supervised, learning...}
 \newpage
 
 \chapter{Overview of semi-supervised learning\label{ch:sstheory}}
+
+\begin{chapabstract}
+In this part we would like to introduce the basic concepts of semi supervised learning, briefly discuss basic assumption that drive SSL models such as smoothness or cluster assumption. We would like to present three major categories of algorithms used in SSL: generative models, low density separation and graph based methods. Finally, we want to give an account for real life applications of SSL methods and tell where it is useful and successful.
+\end{chapabstract}
+
 \section{Introduction}
 Usually students taking a machine learning course would be familiar with two main approaches to machine learning. First one is \textit{supervised learning}. Given a set of training data and a classification method we try to predict classes of unseen and unlabelled instances. 
 
@@ -83,7 +88,7 @@ However, in real life we more often find examples of data which is not labelled 
 \textit{Semi-supervised learning}, is in fact a missing link between these two approaches. Having a limited training set we aim to accurately predict correct classes for unseen data. In this work we would like to explain in details what semi-supervised methods is, what different approaches are and compare it with other available techniques by providing an example of application.
 
 \section{Definition of semi-supervised learning}
-In this work we would like to focus on one particular task of semi supervised classification, which builds on top of classical supervised classification task. There are also other settings, such as semi-supervised clustering or dimensionality reductions which are covered in depth by works from other authors.
+In this work we would like to focus on one particular task of SSL, which builds on top of classical supervised classification task. There are also other settings, such as semi-supervised clustering or dimensionality reductions which are covered in depth by works from other authors.
 
 In semi-supervised classification we aim to find a function $ f $ that will predict classes of unlabelled data with better accuracy than supervised technique using only a very small training set. We extend training set $ X $ so that it contains both kinds of data. In other words, $ X = L \cup U $, where $ L $ is a set of $ n $ instances (denoted by $ x $) with corresponding labels (denoted by $ y $): $ L = \{ (x_1, y_1), (x_2, y_2), ..., (x_n, y_n)\} $ and $ U $ is the set of $ m $ unlabelled data points: $ U = \{ x_{n+1}, x_{n+2}, ..., x_{n+m}\} $. Also, let's call set of $n$ labels or classes only: $ Y = \{ y_1, y_2, ..., y_n \} $
 
@@ -96,13 +101,12 @@ Inductive approach involves using a mixture or labelled and unlabelled data to c
 
 In the latter approach, we focus on classifying data within the training sample. Hence our goal is to classify available unlabelled data deal rather than an external test dataset. Again we can express this as a function: $ f: X_{test} \to Y $, but now $ X_{test} $ contains unlabelled points provided in training set, i.e. $ X_{test} = \{ x_n, x_{n+1}, ..., x_{m} \} $.
 
-
-
 \subsection{Smoothness assumption}
 
 Semi-supervised learning assumes smoothness prior for its inputs and outputs\cite{chapelle06}. For instance, in image processing a general smoothness prior assumes that in a given space output changes in a smooth way over distance or time\cite{stan95}. Similarly in machine learning, labels tend to change smoothly over the space. Under assumptions of semi-supervised learning we extend this generalisation to include information about smoothness of inputs. We assume that for two given inputs $ x_1, x_2 $ in the distance between corresponding labels $ l_1, l_2 $ will be smaller if the inputs are in a high density region, but the labels might be separated further away from each other when inputs are placed in lower density cluster.
 
 \subsection{Cluster assumption}
+\label{sec:clusterassump}
 
 Another assumption we make about the data is that we believe that points tend to form clusters. Furthermore, we assume that if given two points $ x_1, x_2 $ are geometrically within the same cluster, they would share the same class\cite{chapelle06}.
 
@@ -122,15 +126,34 @@ The literature describing SSL presents many models for classification algorithms
 
 Generative models, such as Naive Bays, work under the assumption that the data is distributed with the use of a probability density function. If we mixed two datasets and knew their distributions, we could tell separate them to their original classes. This is why generative models are also called mixture models\cite{Zhu06semi}.
 
-In context of SSL, we often assume that data follows Gaussian distribution and we use both labelled and unlabelled data points to estimate parameters of the distributions. In supervised learning, we would only use training instances and not having enough of these can results in skewed estimation of the parameters. In SSL we try to find an optimal values with help of unlabelled data. 
+In context of SSL, we may for example assume that data follows Gaussian distribution and we use both labelled and unlabelled data points to estimate parameters of the distributions. In supervised learning, we would only use training instances and not having enough of these can results in skewed estimation of the parameters. In SSL we try to find an optimal values with help of unlabelled data.
+
+In this context, we could use a modified version of EM algorithm to find missing labels. In SSL we modify original algorithms - we know that hidden variable corresponding to a class for some instances is indeed not hidden (this is due to cluster assumption described in \ref{sec:clusterassump})\cite{Zhu06semi, chapelle06}. For classification in SSL we may use an iterative version of EM algorithm:
+\newline
+Given set of labelled nodes $X_l$ and unlabelled $X_u$. Do:
+\newline
+\begin{enumerate}
+\item Initialize $t  = 0 $
+\item Build naive Bayes classifier, $ \hat{\theta}$, using labelled data only, i.e. using maximized a posteriori parameter estimation find $ \hat{\theta} = argmax_{\theta} P(X_{l} | \theta)P(\theta) $
+\item Loop until classifier converges:
+\subitem Use $\hat{\theta}$ to approximate class membership of each unlabelled instance - calculate $ P(c_j|x_i, \hat{\theta})$
+\subitem Re-estimate $\hat{\theta}$ including newly calculated estimations of membership to classes to unlabelled data, i.e. compute $ \hat{\theta} = argmax_{\theta} P(X, Y | \theta)P(\theta) $
+\item Output $\hat{\theta}$.
+
+\end{enumerate}
+
+This algorithm, explained in details in \cite{chapelle06}, allows us to find initial classifier for labelled data, calculate predictions for unlabelled instances and pick those results for which we have confidence about them being classified correctly. Then we add these newly labelled instances to our training data and we re-iterate the process in order to build classifier with well estimated parameters.
 
 \subsection{Low-density separation}
 
+Given assumptions described in sections above, we know that our instances will be most probably forming high density regions. We may achieve the goal of classification by pushing decision boundary maximally away from unlabelled data points.
+In order to achieve that we often use a maximum margin algorithm, for instance a modified version of support vector machine (SVN)\cite{chapelle06,Zhu06semi}. In SSL we use Transductive SVM \cite{chapelle06}, also known as Semi Supervised SVM or S3VM \cite{Zhu06semi}.
+The idea behind TVM is very intuitive, we first find a decision boundary using only labelled instances and then we incorporate unlabelled data points into the training to move the boundary away from the points within a certain margin.
 
 
 \subsection{Graph based method}
 
-In graph based methods of semi-supervised learning, in order to classify the data we create an undirected graph $ G = (V, E) $. The set of nodes $ V $ contains both labelled and unlabelled instances. Edges of the graph, the set $ E $, are representing similarity between two connecting nodes, which can be expressed as weight $ w_{i,j} $ between two vertices $x_{i}, x_{j} $. Learning using graph methods involves assigning labels $ y $ to each node of the graph by examining the weights. Thanks to the smoothness assumption we might assume that if weight $ w_{i,j} $ is large, then two labels $ y_i, y_j $ will be the same. Since we provided small training data, there are nodes already having labels assigned, therefore we are able to classify all nodes in the graph\cite{Zhu06semi}.
+In graph based methods of semi-supervised learning, in order to classify the data we create an undirected graph $ G = (V, E) $. The set of nodes $ V $ contains both labelled and unlabelled instances. Edges of the graph, the set $ E $, is representing similarity between two connecting nodes, which can be expressed as weight $ w_{i,j} $ between two vertices $x_{i}, x_{j} $. Learning using graph methods involves assigning labels $ y $ to each node of the graph by examining the weights. Thanks to the smoothness assumption we might assume that if weight $ w_{i,j} $ is large, then two labels $ y_i, y_j $ will be the same. Since we provided small training data, there are nodes already having labels assigned, therefore we are able to classify all nodes in the graph\cite{Zhu06semi}.
 
 Many of the methods for building graphs and estimating weights are distance based, such as fully connected graph, kNN and $\epsilon$NN graphs\cite{Zhu06semi}. In fully connected graph we create edges between all pairs of vertices and we assign weights that are inversely proportional to the Euclidean distance between the nodes. Missing edge would represent an infinite weight\cite{chapelle06}. In kNN case, we only connect k nearest neighbours. $\epsilon$NN takes into account only pairs vertices $ x_i, x_j $ with distance $ \| x_i - x_j \| < \epsilon $.
 
