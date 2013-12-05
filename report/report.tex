@@ -9,6 +9,8 @@
 \usepackage{lipsum}
 \newcommand{\ts}{\textsuperscript}
 \usepackage[usenames,dvipsnames]{color}
+\usepackage{pdfpages} % appending pdf file to tex document
+\usepackage{url}
 
 \newenvironment{chapabstract}
 {
@@ -88,11 +90,7 @@ Keywords: \textbf{semi-supervised, learning...}
 \chapter{Overview of semi-supervised learning\label{ch:sstheory}}
 
 \begin{chapabstract}
-<<<<<<< HEAD
-
-=======
 % Add some chapter abstract so this two chapters can be easily separated to form to papers.
->>>>>>> 6b5b4d79930fe1b6f9c71933a1397e2583424fc2
 In this part we would like to introduce the basic concepts of semi supervised learning, briefly discuss basic assumption that drive SSL models such as smoothness or cluster assumption. We would like to present three major categories of algorithms used in SSL: generative models, low density separation and graph based methods. Finally, we want to give an account for real life applications of SSL methods and tell where it is useful and successful.
 \end{chapabstract}
 
@@ -180,22 +178,36 @@ In contrast to distance based methods of building graphs, there are also propose
 
 \section{Applications of semi-supervised learning}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 \chapter{The experiment}
 
 % \section{Sub-Abstract}
 \begin{chapabstract}
-For experimental part of this assignment we decided to build a simple semi-supervised classifier using algorithms already implemented in \texttt{WEKA} machine learning package. The goal is to learn a model from small subset $A$ of data set $U$ and use all remaining instances $B = U \setminus A$ with removed ground truth $B^{\prime}$ to boost it. With such a classifier we want to check whether it will outperform supervised classifier trained only on initial set $A$ and compare it with supervised classifier trained on data set $U$. The measure of classifiers performance used to evaluate results is a number of correctly classified instances out of whole training set (Confusions Matrices are also provided).
+For experimental part of this assignment we decided to build a simple semi-supervised classifier using algorithms already implemented in \texttt{WEKA} machine learning package. The goal is to learn a model from small subset $A$ of data set $U$ and use all remaining instances $B = U \setminus A$ with removed ground truth $B^{\prime}$ to boost it. With such a classifier we want to check whether it will outperform supervised classifier trained only on initial set $A$ and compare it with supervised classifier trained on whole set $U$. The measure of classifiers performance used to evaluate results is a number of correctly classified instances out of whole training set (Confusions Matrices are also provided).
 \end{chapabstract}
 
 \section{Background}
-As described, the motivation of this project is wide demand for machine learning algorithms which perform comparably good to supervised learning approaches but require fraction of labeled data needed for the later ones. Despite the fact being .
+As described, the motivation of this project is wide demand for machine learning algorithms which would perform comparably good to supervised learning approaches but require only small fraction of labeled data used with nowadays solutions. Building very simple semi-supervised algorithm ... ... ... ... ...
+% Despite the demand in environments where labeling the data is expensive .
 
 \section{Introduction}
-\lipsum[1]
+\lipsum[1] ... ... ... ... ...
 
 \section{Experiment design}
 % \subsection{General approach}
-As explained in \textbf{Chapter~\ref{ch:sstheory}} semi-supervised learning aims at building a classifier from relatively small subset of data which is labeled. To achieve this we randomly extract specified number of labeled data and use it to initially build base classifier. The same sample is used later to train supervised classifier to produce a lower bound on performance.
+As explained in \textbf{Chapter~\ref{ch:sstheory}} semi-supervised learning aims at building a classifier from relatively small subset of data which is labeled. To achieve this we first randomly extract specified number of labeled data and use it to initially build base classifier. The same sample is used later to train \emph{first} supervised classifier to produce a \emph{lower bound} on performance.
 
 \subsubsection{Remark: Obtaining predictions}
 To avoid methodological bias we decided to use 4 implemented in \texttt{WEKA} classifiers:
@@ -206,31 +218,56 @@ To avoid methodological bias we decided to use 4 implemented in \texttt{WEKA} cl
 \item[SMO with RBF kernel] \emph{sequential minimal optimization algorithm for training a support vector classifier}--- with Gamma value 0.01.
 \end{description}
 
-The next step is boosting procedure. To this end, the remaining unlabeled instances ($B^{\prime}$) are classified using 4 mentioned algorithms and partitioned into 4 groups according to obtained prediction:\\[-0.6cm]
+The next step is boosting procedure. To this end, the remaining unlabeled instances ($B^{\prime}$) are classified using 4 mentioned algorithms and partitioned into 4 groups according to obtained predictions:\\[-0.6cm]
 \begin{center}\textbf{How many classifiers agreed on a prediction:}\end{center}
 \begin{tabular}{rp{12cm}}
 % \multicolumn{2}{c}{\textbf{How many classifiers agreed on a prediction:}}\\
 \textbf{All} & All 4 \texttt{WEKA} classifiers agreed on one label prediction.\\
 \textbf{3 out of 4} & 3 classifiers agreed with predicted label. Majority label is selected.\\
-\textbf{2 out of 4} & 2 classifiers agreed on common label. In case of 2 pairs of different labels a ``fair coin is tossed'' to select one out of two labels.\\
+\textbf{2 out of 4} & 2 classifiers agreed on common label. In case 2 other labels have different predicted label the one of first pair is chosen, on contrary if other two labels have common prediction a ``fair coin is tossed'' to select one of them.\\
 \textbf{None} & All classifiers predicted different label. One label is chosen at random.\\[0.4cm]
 \end{tabular}
 
-While running the experiment it is possible to decide how many instances from the above categories should be used to improve classification. Selected instances are labeled based on above rules and appended to training set. With classifiers trained on expanded set remaining unlabeled instances are are classified and grouped. This process is repeated until person running experiment decides to stop boosting procedure.\\
+While running the experiment it is possible to decide how many instances from the above categories should be used for boosting procedure. Selected instances are labeled based on above rules and appended to training set. With classifiers re-trained on expanded set remaining unlabeled instances are are classified and grouped again. This process is repeated until person running the experiment decides to stop boosting procedure.\\
 
-Final step is to indicate whether testing will be performed on external test set or on already supplied training set. In later case supervised learning trained on a whole set is performed with \emph{10-folds cross-validation}; supervised learning on initial part of train set $A$ is evaluated on whole train set $U$ as well as in semi-supervised case.
+Final step is to indicate whether testing will be performed on external test set or on already supplied training set. In later case supervised learning trained on a whole set is performed with \emph{10-folds cross-validation}; supervised learning performed on initial part of train set $A$ is evaluated on whole train set $U$ what is also done in semi-supervised case.\\
+
+The output of a script consists of confusions matrices for each of 3 classification procedures and a number of correct predictions which is just trace of contingency tables out of total number of instances in a data set.\\
+It is possible to specify a number of testing rounds. In this case the results of semi-supervised learning are multiplied by the number of specified testing rounds to ease compare and contrast.
+
+\subsubsection{Remark: Code design and execution of experiment}
+To get more details about input and output of the program please follow to \textbf{Appendix~\ref{ap:code}} or find \texttt{README.md} in GitHub repository\cite{githubcode}.
 
 \section{The experiment}
+To make tests more diverse we decided to use one dataset from each category:
+\begin{itemize}
+\item single binary target label,
+\item single multivalued target label,% beyond binary classification,
+\item multiple binary valued labels.
+% \item multiple multivalued target labels. % if time allows
+\end{itemize}
+As experiments are interactive, multiple configurations for each dataset are tested. What is more, fixing the parameters of tests is not possible up front as there is an element of randomness in choosing training instances. Due to mentioned experiment design, instead of fixing parameters we list the rules to follow in each test.
+
 \subsection{Used data sets}
+Data sets used are listed below and respectively match categories given above.
+\begin{itemize}
+\item \texttt{mushrooms}--- abc,
+\item \texttt{mushrooms}--- 123,
+\item \texttt{mushrooms}--- IIIIII.
+\end{itemize}
+
 \subsection{Approaches to the experiment}
 
+
+% include morkdown later on
+% \includepdf[pages={1}]{myfile.pdf}
 
 
 % Then. supervised algorithm as predictors
 \newpage
-\begin{center} \textbf{\huge ~\vspace{5cm} FIN} \end{center}
+\begin{center} \vspace*{5cm}\textbf{\huge FIN}\vspace*{5cm} \end{center}
 
-\bibliography{references}{}
 \bibliographystyle{plain}
+\bibliography{references}{}
 
 \end{document}
