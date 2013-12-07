@@ -2,7 +2,7 @@
 %  notitlepage - abstract on the same page
 \usepackage{indentfirst} % indent frst paragraph of section
 % \usepackage{fullpage} % full A4 page
-\usepackage[top=0.75in, bottom=1.44in, left=0.75in, right=0.75in]{geometry}
+\usepackage[top=0.85in, bottom=1.44in, left=0.85in, right=0.85in]{geometry}
 \usepackage{amsmath}
 \usepackage[pdftex]{graphicx}
 \usepackage{cite} % BiTeX
@@ -199,11 +199,11 @@ For experimental part of this assignment we decided to build a simple semi-super
 \end{chapabstract}
 
 \section{Background}
-As described, the motivation of this project is wide demand for machine learning algorithms which would perform comparably good to supervised learning approaches but require only small fraction of labeled data used with nowadays solutions. Building very simple semi-supervised algorithm ... ... ... ... ...
+As described, the motivation of this project is wide demand for machine learning algorithms which would perform comparably good to supervised learning approaches but require only small fraction of labeled data used with nowadays solutions. The goal of building elementary semi-supervised algorithm is to check whether with simplistic approach we can achieve accuracy ratio similar to some of the more complex approaches listed in \textbf{Chapter~\ref{ch:sstheory}}. Finally we will propose solution that uses cutting-edge mathematical result which base on \emph{Thompson Sampling} together with \emph{Multi-armed Bandit Theory}.
 % Despite the demand in environments where labeling the data is expensive .
 
 \section{Introduction}
-\lipsum[1] ... ... ... ... ...
+Our approach is based on four supervised learning algorithm. We assume that it is more probable that predicted class is ground truth for particular instances if 4 different classifiers agree on single label. Following this lead, we compare statistics of instances and select labels to rebuild training set. For comprehensive view multiple sets and approaches are used.
 
 \section{Experiment design}
 % \subsection{General approach}
@@ -265,17 +265,41 @@ In our approach the simplest solution to avoid such ``bad luck'' and make sure t
 
 Assuming that we have resolved problem of distribution in initial training set the next stage is to describe taken approaches:
 \begin{enumerate}
-\item first item
-\item second item
-\item third item
+\item \texttt{Maximum exploitation}--- during first boosting iteration all $4/4$ and half of $3/4$ instances are added. Next steps are only taken if there are any elements in mentioned groups and are added based on rule: append elements with higher probability first,
+\item \texttt{Sustainable exploitation}--- during all boosting rounds append only elements from $4/4$ group,
+\item \texttt{Data exploration}--- during first boosting iteration all $4/4$ are appended. All the next steps consists of adding ,
+\item \texttt{No exploration}--- append all instances during first boosting round.
 \end{enumerate}
+Above experiments are conducted with $0.25\%\text{, } 1\%\text{, } 5\%\text{, } 10\% \text{ and } 25\%$ of training set volume.
+
+\subsubsection{Remark: Initial step}
+Number of instances appended to training set during first iteration of boosting procedure seems very important as reasonably the potential error that could occur in added instances during the process do not reproduce possible label error.
+% Give results as snippets on GitHub.
 
 
 \section{Results}
-\lipsum[1]
+This section will be divided into subsections each corresponding to percentage of initial training size. Further discussion comparing each of data sets and taken approach will be included in order depending on outcomes of particular experiment.
+
+\subsection{$\mathbf{25\%}$ sample size}
+We will first discuss results for initial sample of size $25\%$ of original training set.
+
+\subsection{$\mathbf{10\%}$ sample size}
+
+\subsection{$\mathbf{5\%}$ sample size}
+
+\subsection{$\mathbf{1\%}$ sample size}
+
+\subsection{$\mathbf{0.25\%}$ sample size}
 
 \section{Conclusions}
 \lipsum[1]
+
+\section{More complex solution}
+\lipsum[1]
+
+
+
+
 
 \newpage
 \section*{Appendix: A--- Code design\label{ap:code}}
