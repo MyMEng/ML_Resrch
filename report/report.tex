@@ -14,6 +14,8 @@
 \usepackage{newclude} % include latex file without clearpage
 \usepackage{spverbatim} % verbatim environment with line breaks
 
+% \includepdf[pages={1}]{myfile.pdf}
+
 \newenvironment{chapabstract}
 {
 	\vspace{0.5cm}
@@ -256,18 +258,32 @@ Data sets used are listed below and respectively match categories given above.
 \end{itemize}
 
 \subsection{Approaches to the experiment}
-We might get very unlucky getting instances from majority class because of randomness. In real-life application we might take care of supplying diverse distribution of a target label in our initial test set. Or check whether we have diverse initial training set and if not sample instances from unlabeled pool and ask human for it's label until sufficient diversity is achieved.
+To compare performance of designed semi-supervised algorithm we will consider a few approaches and test each of them on all data sets.\\
+It is possible that initial selection of training instances for semi-supervised learning will be very unlucky and only consist of instances with the same label due to random selection. 
+In real-life such situation is not a thread as instances are selected to be uniformly distributed by people. 
+In our approach the simplest solution to avoid such ``bad luck'' and make sure that supplied target labels have diverse distribution could be repeating initialization until instances are ``almost'' uniformly distributed. Other approach  could be to check whether initial training set is diverse and if not sample instances from unlabeled pool asking human for the label until ``sufficient'' diversity is achieved.\\
+
+Assuming that we have resolved problem of distribution in initial training set the next stage is to describe taken approaches:
+\begin{enumerate}
+\item first item
+\item second item
+\item third item
+\end{enumerate}
 
 
+\section{Results}
+\lipsum[1]
+
+\section{Conclusions}
+\lipsum[1]
 
 \newpage
 \section*{Appendix: A--- Code design\label{ap:code}}
-% include morkdown later on
+% include morkdown README.md
 \include*{readme}
-% \includepdf[pages={1}]{myfile.pdf}
 
 
-% Then. supervised algorithm as predictors
+% Then supervised algorithm as predictors
 \newpage
 \begin{center} \vspace*{5cm}\textbf{\huge FIN}\vspace*{5cm} \end{center}
 
