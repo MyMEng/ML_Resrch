@@ -11,6 +11,8 @@
 \usepackage[usenames,dvipsnames]{color}
 \usepackage{pdfpages} % appending pdf file to tex document
 \usepackage{url}
+\usepackage{newclude} % include latex file without clearpage
+\usepackage{spverbatim} % verbatim environment with line breaks
 
 \newenvironment{chapabstract}
 {
@@ -224,7 +226,7 @@ The next step is boosting procedure. To this end, the remaining unlabeled instan
 \textbf{None} & All classifiers predicted different label. One label is chosen at random.\\[0.4cm]
 \end{tabular}
 
-While running the experiment it is possible to decide how many instances from the above categories should be used for boosting procedure. Selected instances are labeled based on above rules and appended to training set. With classifiers re-trained on expanded set remaining unlabeled instances are are classified and grouped again. This process is repeated until person running the experiment decides to stop boosting procedure.\\
+While running the experiment it is possible to decide how many instances from the above categories should be used for boosting procedure. Selected instances are labeled based on above rules and appended to training set. Using re-trained on expanded set classifiers, remaining unlabeled instances are classified and grouped again. This process is repeated until person running the experiment decides to stop boosting procedure.\\
 
 Final step is to indicate whether testing will be performed on external test set or on already supplied training set. In later case supervised learning trained on a whole set is performed with \emph{10-folds cross-validation}; supervised learning performed on initial part of train set $A$ is evaluated on whole train set $U$ what is also done in semi-supervised case.\\
 
@@ -232,7 +234,7 @@ The output of a script consists of confusions matrices for each of 3 classificat
 It is possible to specify a number of testing rounds. In this case the results of semi-supervised learning are multiplied by the number of specified testing rounds to ease compare and contrast.
 
 \subsubsection{Remark: Code design and execution of experiment}
-To get more details about input and output of the program please follow to \textbf{Appendix~\ref{ap:code}} or find \texttt{README.md} in GitHub repository\cite{githubcode}.
+To get more details about input and output of the program please follow to \textbf{Appendix~A} or find \texttt{README.md} in GitHub repository\cite{githubcode}.
 
 \section{The experiment}
 To make tests more diverse we decided to use one dataset from each category:
@@ -248,15 +250,20 @@ As experiments are interactive, multiple configurations for each dataset are tes
 Data sets used are listed below and respectively match categories given above.
 \begin{itemize}
 \item \texttt{mushrooms}--- Mushrooms Database~\cite{mushroomsDS},
-\item \texttt{mushrooms}--- 123,
-\item \texttt{birds}--- Birds Database~\cite{birdsDS},
+\item \texttt{nursery}--- Nursery Data Set~\cite{nurseryDS},
+% \item \texttt{birds}--- Birds Database~\cite{birdsDS},
 \item \texttt{scene}--- Scene Database~\cite{sceneDS}.
 \end{itemize}
 
 \subsection{Approaches to the experiment}
+We might get very unlucky getting instances from majority class because of randomness. In real-life application we might take care of supplying diverse distribution of a target label in our initial test set. Or check whether we have diverse initial training set and if not sample instances from unlabeled pool and ask human for it's label until sufficient diversity is achieved.
 
 
+
+\newpage
+\section*{Appendix: A--- Code design\label{ap:code}}
 % include morkdown later on
+\include*{readme}
 % \includepdf[pages={1}]{myfile.pdf}
 
 

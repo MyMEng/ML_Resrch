@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# multimarkdown ../README.md -t latex -o readme.tex
 pdflatex report
 bibtex report
 pdflatex report

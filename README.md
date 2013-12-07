@@ -4,7 +4,8 @@
 ---
 
 ## Introductions
-This repository contains `python` script which performs simple *semi-supervised* learning using `WEKA` ML software. For comparison purposes the script also performs supervised learning to provide statistics at the end.
+This repository contains `python` script which performs simple *semi-supervised* learning using `WEKA` ML software. For comparison purposes the script also performs supervised learning to provide statistics at the end.  
+To assure proper execution all: test set, training set and label file must be in the same directory as the script.
 
 ## To run (UNIX based systems):
 If you have GIT installed just open terminal and clone repository:
