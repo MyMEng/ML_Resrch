@@ -38,3 +38,7 @@
 experiment/*.arff
 experiment/*.xml
 experiment/data/*
+
+# Out
+report/reults25.txt
+

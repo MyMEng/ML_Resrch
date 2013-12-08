@@ -249,7 +249,7 @@ To make tests more diverse we decided to use one dataset from each category:
 As experiments are interactive, multiple configurations for each dataset are tested. What is more, fixing the parameters of tests is not possible up front as there is an element of randomness in choosing training instances. Due to mentioned experiment design, instead of fixing parameters we list the rules to follow in each test.
 
 \subsection{Used data sets}
-Data sets used are listed below and respectively match categories given above.
+Data sets used are listed below and respectively match categories given above. To create test and training for \texttt{mushrooms} and \texttt{nursery} the data were shuffled and split in half to create to form two disjunctive sets from provided one. \texttt{scene} was already provided with test and training set.
 \begin{itemize}
 \item \texttt{mushrooms}--- Mushrooms Database~\cite{mushroomsDS},
 \item \texttt{nursery}--- Nursery Data Set~\cite{nurseryDS},
@@ -265,12 +265,11 @@ In our approach the simplest solution to avoid such ``bad luck'' and make sure t
 
 Assuming that we have resolved problem of distribution in initial training set the next stage is to describe taken approaches:
 \begin{enumerate}
-\item \texttt{Maximum exploitation}--- during first boosting iteration all $4/4$ and half of $3/4$ instances are added. Next steps are only taken if there are any elements in mentioned groups and are added based on rule: append elements with higher probability first,
-\item \texttt{Sustainable exploitation}--- during all boosting rounds append only elements from $4/4$ group,
-\item \texttt{Data exploration}--- during first boosting iteration all $4/4$ are appended. All the next steps consists of adding ,
-\item \texttt{No exploration}--- append all instances during first boosting round.
+\item \texttt{Maximum exploitation}--- during first boosting iteration all $4/4$ and half of $3/4$ instances are added. Next steps are only taken if there is any elements in mentioned groups and are added based on rule: append elements with higher probability first,
+\item \texttt{No exploration}--- append all instances during first boosting round,
+\item \texttt{Sustainable exploitation}--- during first round all boosting rounds append elements only from $4/4$ group.
 \end{enumerate}
-Above experiments are conducted with $0.25\%\text{, } 1\%\text{, } 5\%\text{, } 10\% \text{ and } 25\%$ of training set volume.
+Above experiments are conducted with $0.25\%\text{, } 5\% \text{ and } 25\%$ of training set volume.
 
 \subsubsection{Remark: Initial step}
 Number of instances appended to training set during first iteration of boosting procedure seems very important as reasonably the potential error that could occur in added instances during the process do not reproduce possible label error.
@@ -283,14 +282,10 @@ This section will be divided into subsections each corresponding to experiment i
 \subsection{$\mathbf{25\%}$ sample}
 We will first discuss results with initial sample of size $25\%$ of original training set. The input and output for each of given results are provided together with this report~\cite{results25}
 
-\subsection{$\mathbf{10\%}$ sample}
-\lipsum[1]~\cite{results10}
 
 \subsection{$\mathbf{5\%}$ sample}
 \lipsum[1]~\cite{results5}
 
-\subsection{$\mathbf{1\%}$ sample}
-\lipsum[1]~\cite{results1}
 
 \subsection{$\mathbf{0.25\%}$ sample}
 \lipsum[1]~\cite{results025}
