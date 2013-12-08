@@ -195,22 +195,23 @@ Moreover, thanks to relatively good SSL performance we can generalize that it is
 
 % \section{Sub-Abstract}
 \begin{chapabstract}
-For experimental part of this assignment we decided to build a simple semi-supervised classifier using algorithms already implemented in \texttt{WEKA} machine learning package. The goal is to learn a model from small subset $A$ of data set $U$ and use all remaining instances $B = U \setminus A$ with removed ground truth $B^{\prime}$ to boost it. With such a classifier we want to check whether it will outperform supervised classifier trained only on initial set $A$ and compare it with supervised classifier trained on whole set $U$. The measure of classifiers performance used to evaluate results is a number of correctly classified instances out of whole training set (Confusions Matrices are also provided).
+For experimental part of this assignment we decided to build a simple \emph{self-training semi-supervised} classifier using algorithms already implemented in \texttt{WEKA} machine learning package. The goal is to learn a model from small subset $A$ of training set $U$ and use all remaining instances $B = U \setminus A$ with removed ground truth $B^{\prime}$ to boost it. With such a classifier we want to check whether it will outperform supervised classifier trained only on initial set $A$ and compare it with supervised classifier trained on whole set $U$. The measure of classifiers performance used to evaluate results is a number of correctly classified instances out of whole test set (Confusions Matrices are also provided).
 \end{chapabstract}
 
 \section{Background}
-As described, the motivation of this project is wide demand for machine learning algorithms which would perform comparably good to supervised learning approaches but require only small fraction of labeled data used with nowadays solutions. The goal of building elementary semi-supervised algorithm is to check whether with simplistic approach we can achieve accuracy ratio similar to some of the more complex approaches listed in \textbf{Chapter~\ref{ch:sstheory}}. Finally we will propose solution that uses cutting-edge mathematical result which base on \emph{Thompson Sampling} together with \emph{Multi-armed Bandit Theory}. We chose this approach as it is the most general one as it does not assumes any particular distribution within the data.
+As described, the motivation of this project is wide demand for machine learning algorithms which would perform comparably good to supervised learning approaches but require only small fraction of labeled data used with nowadays solutions. The goal of building elementary semi-supervised algorithm is to check whether with simplistic approach we can achieve correct prediction ratio close to the one of some more complex approaches listed in \textbf{Chapter~\ref{ch:sstheory}}. 
+%Finally we will propose solution that uses cutting-edge mathematical result which base on \emph{Thompson Sampling} together with \emph{Multi-armed Bandit Theory}.
 % Despite the demand in environments where labeling the data is expensive .
 
 \section{Introduction}
-Our approach is based on four supervised learning algorithm. We assume that it is more probable that predicted class is ground truth for particular instances if 4 different classifiers agree on single label. Following this lead, we compare statistics of instances and select labels to rebuild training set. For comprehensive view multiple sets and approaches are used. In literature such algorithm is called \emph{self-training} and number of classifiers that agree on prediction can be considered as confidence measure. Such algorithm are known to be good in natural language processing but we need to bear in mind that potential error can reinforce itself. This method is known to belong to \emph{wrapper} family as it can be applied to any approach that can return a measure of how good the unlabeled data is probable to cover with ground truth (in our case $4/4$, $3/4$, etc.)~\cite{zhu2009introduction}.
+Our approach is based on four supervised learning algorithm. We assume that it is more probable that predicted class agrees with ground truth for particular instances if 4 different classifiers agree on predicted label. Following this lead, we compare mentioned statistics of instances and use data points with appended predicted label to rebuild training set. For comprehensive view multiple sets and approaches are used. In literature such solution is called \emph{self-training algorithm} and number of classifiers that agree on prediction can be considered as \emph{confidence measure}. Such algorithms are known to be good in natural language processing but we need to bear in mind that potential error made on predicted label can reinforce itself. We chose this approach as it is the most general one and does not assume any particular distribution within the data. \emph{Self-training} belongs to \emph{wrapper} methods family as it can be used with any approach that measures how good the prediction of unlabeled data is probable to overlap with ground truth~\cite{zhu2009introduction}.
 
 \section{Experiment design}
 % \subsection{General approach}
-As explained in \textbf{Chapter~\ref{ch:sstheory}} semi-supervised learning aims at building a classifier from relatively small subset of data which is labeled. To achieve this we first randomly extract specified number of labeled data and use it to initially build base classifier. The same sample is used later to train \emph{first} supervised classifier to produce a \emph{lower bound} on performance.
+As explained in \textbf{Chapter~\ref{ch:sstheory}} semi-supervised learning aims at building a classifier from relatively small subset of data which is labeled. To achieve this, we first randomly extract specified number of labeled data points and use them to initially train base classifier. The same sample is used later to train one of supervised classifier to produce predictions that will be used as a \emph{lower bound} on performance.
 
 \subsubsection{Remark: Obtaining predictions}
-To avoid methodological bias we decided to use 4 implemented in \texttt{WEKA} classifiers:
+To avoid methodological bias and produce \emph{confidence measure} we decided to use 4 supervised classifiers implemented in \texttt{WEKA}:
 \begin{description}
 \item[J48 tree] \emph{C4.5 decision tree}--- confidence factor 0.25; the minimum number of objects in the leaf nodes 2; number of folds 3,
 \item[IBk] \emph{$k$ nearest neighbors}--- $k$ value equal to 1; linear nearest neighbor search with euclidean distance,
@@ -218,38 +219,46 @@ To avoid methodological bias we decided to use 4 implemented in \texttt{WEKA} cl
 \item[SMO with RBF kernel] \emph{sequential minimal optimization algorithm for training a support vector classifier}--- with Gamma value 0.01.
 \end{description}
 
-The next step is boosting procedure. To this end, the remaining unlabeled instances ($B^{\prime}$) are classified using 4 mentioned algorithms and partitioned into 4 groups according to obtained predictions:\\[-0.6cm]
+The next step is boosting procedure. To this end, the remaining unlabeled instances ($B^{\prime}$) are classified using 4 mentioned algorithms and partitioned into 4 groups which represents \emph{confidence measure} in our approach. Groups are formed according to obtained predictions:\\[-0.6cm]
 \begin{center}\textbf{How many classifiers agreed on a prediction:}\end{center}
 \begin{tabular}{rp{12cm}}
 % \multicolumn{2}{c}{\textbf{How many classifiers agreed on a prediction:}}\\
 \textbf{All} & All 4 \texttt{WEKA} classifiers agreed on one label prediction.\\
 \textbf{3 out of 4} & 3 classifiers agreed with predicted label. Majority label is selected.\\
-\textbf{2 out of 4} & 2 classifiers agreed on common label. In case 2 other labels have different predicted label the one of first pair is chosen, on contrary if other two labels have common prediction a ``fair coin is tossed'' to select one of them.\\
+\textbf{2 out of 4} & 2 classifiers agreed on common label. In case 2 other classifiers have different predicted labels the one of first pair is chosen. On contrary, if other two classifiers have common prediction a ``fair coin is tossed'' to select one of them.\\
 \textbf{None} & All classifiers predicted different label. One label is chosen at random.\\[0.4cm]
 \end{tabular}
 
-While running the experiment it is possible to decide how many instances from the above categories should be used for boosting procedure. Selected instances are labeled based on above rules and appended to training set. Using re-trained on expanded set classifiers, remaining unlabeled instances are classified and grouped again. This process is repeated until person running the experiment decides to stop boosting procedure.\\
+While running the experiment it is possible to decide how many instances from the above categories should be used for boosting procedure. Selected exemplars are labeled based on listed above rules and appended to training set. Then, remaining unlabeled instances are predicted using re-trained on just expanded set classifiers and grouped. This process is repeated until person running the experiment decides to stop boosting procedure.\\
 
-Final step is to indicate whether testing will be performed on external test set or on already supplied training set. In later case supervised learning trained on a whole set is performed with \emph{10-folds cross-validation}; supervised learning performed on initial part of train set $A$ is evaluated on whole train set $U$ what is also done in semi-supervised case.\\
+Final step is to indicate whether testing will be performed on external test set or on already supplied training set. 
+In later case performance of:
+\begin{itemize}
+\item ``supervised learning'' part of experiment trained on a whole supplied training set is evaluated with \emph{10-folds cross-validation} (upper bound);
+\item ``supervised learning'' trained only on initial part of training set- $A$- is evaluated on whole set- $U$ (lower bound);
+\item semi-supervised learning is evaluated also on whole set $U$ containing ground truth of each instance.
+\end{itemize}
 
-The output of a script consists of confusions matrices for each of 3 classification procedures and a number of correct predictions which is just trace of contingency tables out of total number of instances in a data set.\\
-It is possible to specify a number of testing rounds. In this case the results of semi-supervised learning are multiplied by the number of specified testing rounds to ease compare and contrast.
+It is also possible to specify a number of testing rounds in case there is no separate test set. In this case two supervised parts of experiment are repeated specified number of times and results for each iteration are summed into global score. For semi-supervised learning results are just multiplied by the number iterations to make comparing and contrasting easier.\\
+
+The output of a script consists of confusions matrices and a number of correct predictions for each part of the experiment listed above. The later values are calculated as trace of contingency table and total number of instances in a data set.
 
 \subsubsection{Remark: Code design and execution of experiment}
-To get more details about input and output of the program please follow to \textbf{Appendix~A} or find \texttt{README.md} in GitHub repository\cite{githubcode}.
+To get more details about input, output and usage of the program please follow to \textbf{Appendix~A} or find \texttt{README.md} in GitHub repository~\cite{githubcode}.
 
 \section{The experiment}
-To make tests more diverse we decided to use one dataset from each category:
+To make tests more diverse we decided to use one dataset from each of given below categories:
 \begin{itemize}
 \item single binary target label,
 \item single multivariate target label,% beyond binary classification - multivalued
 \item multiple binary valued labels.
 % \item multiple multivalued target labels. % if time allows
 \end{itemize}
-As experiments are interactive, multiple configurations for each dataset are tested. What is more, fixing the parameters of tests is not possible up front as there is an element of randomness in choosing training instances. Due to mentioned experiment design, instead of fixing parameters we list the rules to follow in each test.
+For multi-label data sets the classification is performed separately for each target label and score is calculated as a sum over all labels.\\
+Designed interactive nature of experiment allows multiple configurations for each data set to be tested. What is more, fixing the parameters of tests up front is not possible as there is an element of randomness in choosing training instances. Therefore, instead of fixing parameters we list the rules to follow in each test in \textbf{Section~\ref{sec:experimetnapproach}}.
 
 \subsection{Used data sets}
-Data sets used are listed below and respectively match categories given above. To create test and training for \texttt{mushrooms} and \texttt{nursery} the data were shuffled and split in half to create to form two disjunctive sets from provided one. \texttt{scene} was already provided with test and training set.
+Data sets that were used are listed below and respectively match categories given above. To create test and training for \texttt{mushrooms} and \texttt{nursery} the data were shuffled and split in half to create two disjunctive sets from only one provided. \texttt{scene} was already given with separate test and training set.
 \begin{itemize}
 \item \texttt{mushrooms}--- Mushrooms Database~\cite{mushroomsDS},
 \item \texttt{nursery}--- Nursery Data Set~\cite{nurseryDS},
@@ -257,46 +266,43 @@ Data sets used are listed below and respectively match categories given above. T
 \item \texttt{scene}--- Scene Database~\cite{sceneDS}.
 \end{itemize}
 
-\subsection{Approaches to the experiment}
-To compare performance of designed semi-supervised algorithm we will consider a few approaches and test each of them on all data sets.\\
-It is possible that initial selection of training instances for semi-supervised learning will be very unlucky and only consist of instances with the same label due to random selection. 
-In real-life such situation is not a thread as instances are selected to be uniformly distributed by people. 
-In our approach the simplest solution to avoid such ``bad luck'' and make sure that supplied target labels have diverse distribution could be repeating initialization until instances are ``almost'' uniformly distributed. Other approach  could be to check whether initial training set is diverse and if not sample instances from unlabeled pool asking human for the label until ``sufficient'' diversity is achieved.\\
+\subsection{Approaches to the experiment\label{sec:experimetnapproach}}
+To compare performance of designed semi-supervised algorithm we will consider a few approaches and test each of them on all chosen data sets.\\
+It is possible that initial selection of training instances for semi-supervised learning will be very unlucky and consists only of instances with the same label due to random sampling. 
+In real-life such situation is not a thread as instances are carefully selected by scientists to be uniformly distributed. 
+In our approach the simplest solution to avoid such ``bad luck'' and make sure that supplied target labels have diverse distribution could be repeating random training set initialization until instances are ``almost'' uniformly distributed according to their ground truth. Other approach could be to check whether initial training set is diverse and if not sample instances from unlabeled pool asking user (with our design not needed as ground truth is available) for the label until ``sufficient'' diversity is achieved.\\
 
 Assuming that we have resolved problem of distribution in initial training set the next stage is to describe taken approaches:
 \begin{enumerate}
-\item \texttt{Maximum exploitation}--- during first boosting iteration all $4/4$ and half of $3/4$ instances are added. Next steps are only taken if there is any elements in mentioned groups and are added based on rule: append elements with higher probability first,
+\item \texttt{Maximum exploitation}--- during first boosting iteration all $4/4$ and half of $3/4$ instances are added. Next steps are only taken if there is any elements in mentioned groups and instances are added based on rule: append all elements with higher probability first until none left,
 \item \texttt{No exploration}--- append all instances during first boosting round,
-\item \texttt{Sustainable exploitation}--- during first round all boosting rounds append elements only from $4/4$ group.
+\item \texttt{Maximum exploration}--- during first round append all instances from $4/4$ group. Then, in each round add maximum of $10\%$ of initial number of instances in $U$ with priority given to groups with higher rank. Repeat the last step until no instances are left.
 \end{enumerate}
-Above experiments are conducted with $0.25\%\text{, } 5\% \text{ and } 25\%$ of training set volume.
+Above experiments are conducted with $0.25\%\text{, } 5\% \text{ and } 25\%$ of whole training set ($U$) volume.
 
 \subsubsection{Remark: Initial step}
-Number of instances appended to training set during first iteration of boosting procedure seems very important as reasonably the potential error that could occur in added instances during the process do not reproduce possible label error.
+Number of instances appended to training set during first boosting round seems very important. Reasonably the potential error in prediction of labels that could occur will be reinforced during next iterations of boosting procedure. Potential solution could be maximizing the number of instances added in the first round as we know that their labels are correct so produced classifier will not have any bias due to incorrect training set. The key point here is to find equilibrium in number of exemplars added in initial boosting round to avoid reproducing potential error and do not loose possible information gain in next iterations (if we use all instances in first round).
 % Give results as snippets on GitHub.
 
 
 \section{Results}
 This section will be divided into subsections each corresponding to experiment involving given percentage of initial training set size. Further discussion comparing each of the data sets and taken approach will be included in order depending on outcomes of particular experiment.
 
-\subsection{$\mathbf{25\%}$ sample}
-We will first discuss results with initial sample of size $25\%$ of original training set. The input and output for each of given results are provided together with this report~\cite{results25}
+\subsection{$\mathbf{25\%}$ sample~\cite{results25}}
+We will first discuss results with initial sample of size $25\%$ of original training set. The input and output for each of given results are provided together with this report
 
 
-\subsection{$\mathbf{5\%}$ sample}
-\lipsum[1]~\cite{results5}
+\subsection{$\mathbf{5\%}$ sample~\cite{results5}}
+\lipsum[1]
 
 
-\subsection{$\mathbf{0.25\%}$ sample}
-\lipsum[1]~\cite{results025}
+\subsection{$\mathbf{0.25\%}$ sample~\cite{results025}}
+\lipsum[1]
 
 \section{Conclusions}
-\lipsum[1]
+\lipsum[1-3]
 
-\section{More complex solution}
-\lipsum[1]
-
-
+% \section{More complex solution} \lipsum[1]
 
 
 
@@ -305,10 +311,9 @@ We will first discuss results with initial sample of size $25\%$ of original tra
 % include morkdown README.md
 \include*{readme}
 
-
 % Then supervised algorithm as predictors
-\newpage
-\begin{center} \vspace*{5cm}\textbf{\huge FIN}\vspace*{5cm} \end{center}
+% \newpage
+% \begin{center} \vspace*{5cm}\textbf{\huge FIN}\vspace*{5cm} \end{center}
 
 \bibliographystyle{plain}
 \bibliography{references}{}
