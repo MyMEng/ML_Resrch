@@ -1078,6 +1078,12 @@ for singleLabel in range(noLabels):
 		"don't have one c-v will be performed on whole data set; in this case " +
 		" type [none]: " ) )
 
+	# If multi-label extract specified label from external test set
+	if noLabels == 1 :
+		pass
+	else :
+		extTest = partialFile( extTest, singleLabel, noLabels, allAtributes )
+
 	#	check accuracy of created data set
 	semisupResults = performSemiSupervised( argumentFilename, extTest, repetitions )
 	cumulativeSemisup = accumulateLists(cumulativeSemisup, semisupResults)
