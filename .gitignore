@@ -35,10 +35,6 @@
 *.pdf
 
 # Python
-experiment/*.arff
-experiment/*.xml
-experiment/data/*
 
 # Out
-report/reults25.txt
-report/reults*.txt
+*/reults*.txt

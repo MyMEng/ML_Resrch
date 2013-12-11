@@ -278,14 +278,14 @@ Assuming that we have resolved problem of distribution in initial training set t
 \item \texttt{No exploration}--- append all instances during first boosting round,
 \item \texttt{Maximum exploration}--- during first round append all instances from $4/4$ group. Then, in each round add maximum of $1\%$ of initial number of instances in $U$ with priority given to groups with higher rank. Repeat the last step until no instances are left.
 \end{enumerate}
-Above experiments are conducted with $0.25\%\text{, } 5\% \text{ and } 25\%$ of whole training set ($U$) volume.
+Above experiments are conducted with $0.25\%\text{, } 10\% \text{ and } 25\%$ of whole training set ($U$) volume.
 
 \subsubsection{Remark: Initial step}
 Number of instances appended to training set during first boosting round seems very important. Reasonably the potential error in prediction of labels that could occur will be reinforced during next iterations of boosting procedure. Potential solution could be maximizing the number of instances added in the first round as we know that their labels are correct so produced classifier will not have any bias due to incorrect training set. The key point here is to find equilibrium in number of exemplars added in initial boosting round to avoid reproducing potential error and do not loose possible information gain in next iterations (if we use all instances in first round).
 % Give results as snippets on GitHub.
 
 
-\section{Results}
+\section{Results~\cite{results}}
 This section will be divided into subsections each corresponding to experiment involving given percentage of initial training set size. Further discussion comparing each of the data sets and taken approach will be included in order depending on outcomes of particular experiment.
 
 \subsection{$\mathbf{25\%}$ sample~\cite{results25}}
@@ -295,7 +295,7 @@ We will first discuss results with initial sample of size $25\%$ of original tra
 \subsubsection{\texttt{scene}}
 
 
-\subsection{$\mathbf{5\%}$ sample~\cite{results5}}
+\subsection{$\mathbf{10\%}$ sample~\cite{results10}}
 \subsubsection{\texttt{mushrooms}}
 \subsubsection{\texttt{nursery}}
 \subsubsection{\texttt{scene}}
