@@ -171,6 +171,11 @@ Given assumptions described in sections above, we know that our instances will b
 In order to achieve that we often use a maximum margin algorithm, for instance a modified version of support vector machine (SVM)\cite{chapelle06,Zhu06semi}. In SSL we use Transductive SVM \cite{chapelle06}, also known as Semi Supervised SVM or S3VM \cite{Zhu06semi}.
 The idea behind TVM is very intuitive: we first have to find a decision boundary using only labelled instances. Then we incorporate unlabelled data points into the training to move the boundary away from the points within a certain margin.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.5\textwidth]{graphics/s3vm.png}
+\caption{ Difference between decision boundary created using only training dataset (left) and pushed boundary by added unlabelled points (right).\label{fig:SvmMethodFig}}
+\end{figure}
 
 \subsection{Graph based method}
 
@@ -178,7 +183,15 @@ One more category of classification methods in semi-supervised learning use grap
 
 Many of the methods for building graphs and estimating weights are distance based, such as fully connected graph, kNN and $\epsilon$NN graphs\cite{Zhu06semi}. In fully connected graph we create edges between all pairs of vertices and we assign weights that are inversely proportional to the Euclidean distance between the nodes. Missing edge would represent an infinite weight\cite{chapelle06}. In kNN case, we only connect k nearest neighbours. $\epsilon$NN takes into account only pairs vertices $ x_i, x_j $ with distance $ \| x_i - x_j \| < \epsilon $.
 
-In contrast to distance based methods of building graphs, there are also proposed generative approaches that are claimed to be more effective for certain datasets than methods using discriminative approach\cite{He07}. Rather than calculating Euclidean distance, we estimate conditional probabilities of classes given data points and set them as weights between nodes. 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.3\textwidth]{graphics/graph-methods.jpg}
+\caption{ An illustration of how graph based method works.\label{fig:GraphMethodFig}}
+\end{figure}
+
+In figure \ref{fig:GraphMethodFig} we can see a very simplified example in which only two instances $x_1$ and $x_2$ were labelled - nodes were constructed between nearest neighbours and we can classify those unlabelled by following paths from the labelled data points.
+
+In contrast to distance based methods of building graphs, there are also proposed generative approaches that are claimed to be more effective for certain datasets than methods using discriminative approach\cite{He07}. Rather than calculating Euclidean distance, we estimate conditional probabilities of classes given data points and set them as weights between nodes.
 
 \section{Applications of semi-supervised learning}
 
