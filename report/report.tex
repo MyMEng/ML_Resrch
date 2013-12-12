@@ -352,7 +352,7 @@ For 0.25\% sampling of initial training set we arrive at \emph{Figure~\ref{img:0
 \end{figure}
 
 \subsubsection{\texttt{mushrooms}--- \texttt{red}}
-blah blah
+The experiments ran on this data set prove increase in accuracy while using semi-supervised learning. First two approaches ($x \in \left \{ 1, 2, 3 ,4, 5, 6 \right \}$) perform significantly better than the last one.
 
 \subsubsection{\texttt{nursery}--- \texttt{green}}
 blah blah
@@ -368,12 +368,14 @@ blah for general
 
 
 \subsection{Data sets overview}
-GENERAL TEXT BLAH BLAH BLAH
+\emph{Figures~\ref{img:mushrooms},~\ref{img:nursery},~\ref{img:scene}} presented below are showing outcomes of \texttt{mushrooms}, \texttt{nursery} and \texttt{scene} data sets respectively. y-axis contains number of correctly classified instances and x-axis is the ID of the experiment in the same order as in previous figures.\\
+Magenta solid line represents the total number of exemplars. Blue solid line is the number of correctly classified instances while using supervised algorithm trained on whole training set. Colors: red, green and blue corresponds to 25\%, 10\% and 0.25\% samples accordingly. \texttt{\textbf{+}} symbol indicates outcome of semi-supervised algorithm while, \texttt{\textbf{o}} illustrate the same value for supervised algorithm trained on initial sample.
+
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.5\textwidth]{graphics/figures/fig1.jpg}
 	\begin{tiny}
-		\caption{\small Figure for \texttt{mushrooms}.\label{img:mushrooms}}
+		\caption{\small \texttt{mushrooms} data set.\label{img:mushrooms}}
 	\end{tiny}
 \end{figure}
 
@@ -381,7 +383,7 @@ GENERAL TEXT BLAH BLAH BLAH
 	\centering
 	\includegraphics[width=0.5\textwidth]{graphics/figures/fig2.jpg}
 	\begin{tiny}
-		\caption{\small Figure for \texttt{nursery}.\label{img:nursery}}
+		\caption{\small \texttt{nursery} data set.\label{img:nursery}}
 	\end{tiny}
 \end{figure}
 
@@ -389,13 +391,14 @@ GENERAL TEXT BLAH BLAH BLAH
 	\centering
 	\includegraphics[width=0.5\textwidth]{graphics/figures/fig3.jpg}
 	\begin{tiny}
-		\caption{\small Figure for \texttt{scene}.\label{img:scene}}
+		\caption{\small \texttt{scene} data set.\label{img:scene}}
 	\end{tiny}
 \end{figure}
 
 
 \section{Conclusions}
-To sum up, using designed and tested by us classifier can not harm the classification what was shown in \textbf{Section~\ref{sec:results}}
+To sum up, using designed and tested by us classifier can not harm the classification what was shown in \textbf{Section~\ref{sec:results}}.
+First two approaches seems stabel and give overall improvement in all data sets while the last one does not always  give better accuracy.
 % \section{More complex solution} \lipsum[1]
 
 
