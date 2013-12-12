@@ -285,10 +285,10 @@ Number of instances appended to training set during first boosting round seems v
 % Give results as snippets on GitHub.
 
 
-\section{Results~\cite{results}}
+\section{Results~\cite{results} \label{sec:results}}
 This section will be divided into subsections each corresponding to experiment involving given percentage of initial training set size. Further discussion comparing each of the data sets and taken approach will be included in order depending on outcomes of particular experiment.\\
 
-The experiments with \texttt{scene} data set are only conducted with $0.25\%$ sample size and are presented in \textbf{Section~\ref{sec:025}}. This decision is due to focus put on very small training sets.
+The experiments with \texttt{scene} data set are only conducted with $0.25\%$ sample size and are presented in \textbf{Section~\ref{sec:results025}}. This decision is due to focus put on very small training sets.
 
 \subsubsection{Remark: How to read figures.}
 In the following three figures: \textbf{\ref{img:25pc}}, \textbf{\ref{img:10pc}} and \textbf{\ref{img:025pc}} percentage of correctly classified instances is shown on y-axis. x-axis ranging from $1$ to $9$ is experiment number.\\
@@ -296,7 +296,7 @@ In the following three figures: \textbf{\ref{img:25pc}}, \textbf{\ref{img:10pc}}
 \texttt{red} color corresponds to \texttt{mushrooms} data set; \texttt{green} and \texttt{blue} are respectively \texttt{nursery} and \texttt{scene}.\\
 Solid \texttt{line} is ``upper bound'' that resulted in training classifier on whole data set. \texttt{\textbf{+}} indicate outcome of semi-supervised learning; finally, \texttt{\textbf{o}} points result of supervised learning on initial sample of training set.
 
-\subsection{$\mathbf{25\%}$ sample~\cite{results25}}
+\subsection{$\mathbf{25\%}$ sample~\cite{results25} \label{sec:results25}}
 We will first discuss results with initial sample of size $25\%$ of original training set. The input and output for each of given results are provided together with this report (see references in headers).
 \begin{figure}[htbp]
 \centering
@@ -313,10 +313,12 @@ Analysis of the outcomes in \emph{Figure~\ref{img:25pc}} gives that performance 
 In this case semi-supervised learning performs not more than 3\% better than supervised one trained on the same initial sample. We can safely assume that similarly to above example the difference is not significant while considering needed resources.
 
 \subsection*{}
+While comparing three taken approaches there is not much difference visible. All of them behave comparably well on sample training size of 0.25 of initial set.\\
+
 Generally, with training set of this size we concluded that performing semi-supervised learning is not worth the time and computational power it takes in comparison with possible accuracy gain. This conclusion is based on outcomes for both data sets as loose in performance do not exceed 3\% while comparing supervised and semi-supervised learning with exactly the same initial training set supplied.
 
-\subsection{$\mathbf{10\%}$ sample~\cite{results10}}
-The following figure shows the results of experiment conducted on initial sample of $10\%$ of .
+\subsection{$\mathbf{10\%}$ sample~\cite{results10}\label{sec:results10}}
+The following figure shows the results of experiment conducted on initial sample of $10\%$ of the training set. The overall outcomes are similar to one presented in \textbf{Section~\ref{sec:results25}}. Nonetheless, we can see minor decrease in performance probably due to more than 2 times smaller training set.
 
 \begin{figure}[htbp]
 \centering
@@ -327,12 +329,20 @@ The following figure shows the results of experiment conducted on initial sample
 \end{figure}
 
 \subsubsection{\texttt{mushrooms}--- \texttt{red}}
+The performance of semi supervised learning on this data set is generally better than outcomes of supervised learning on initial training set. Nonetheless, the difference in accuracy does not exceed 1\% what once again indicates that expensive semi-supervised classification may not be worth the possible gain in number of correct prediction.
+
 \subsubsection{\texttt{nursery}--- \texttt{green}}
+Here, outcomes follow similar pattern as in example above. Performance of semi-supervised algorithm is persistently better than what can be achieved using supervised learning on initial training sample.
+
 \subsection*{}
+While comparing the results with regard to used approaches we can clearly see that \texttt{maximum exploitation} ($x \in \left \{ 1, 2, 3 \right \}$) and \texttt{no exploration} ($x \in \left \{ 4, 5, 6 \right \}$) performs better than \texttt{maximum exploration} ($x \in \left \{ 7, 8, 9 \right \}$). In the later one we can see that the results are approximately the same for supervised method trained on initial sample and for semi-supervised algorithm what leads to conclusion that in this case this approach is not worth needed resources.\\
+Taking under consideration complexity of the last approach we may conclude.\\
+
+Blah blah general conclusion for 10\%.
 
 
-
-\subsection{$\mathbf{0.25\%}$ sample~\cite{results025}\label{sec:025}}
+\subsection{$\mathbf{0.25\%}$ sample~\cite{results025}\label{sec:results025}}
+blah blah for 025
 
 \begin{figure}[htbp]
 \centering
@@ -347,6 +357,7 @@ The following figure shows the results of experiment conducted on initial sample
 \subsubsection{\texttt{scene}--- \texttt{blue}}
 
 
+\subsection{Data sets overview}
 GENERAL TEXT BLAH BLAH BLAH
 
 \begin{figure}[htbp]
@@ -355,12 +366,18 @@ GENERAL TEXT BLAH BLAH BLAH
 	\begin{tiny}
 		\caption{\small Figure for \texttt{mushrooms}.\label{img:mushrooms}}
 	\end{tiny}
+\end{figure}
 
+\begin{figure}[htbp]
+	\centering
 	\includegraphics[width=0.5\textwidth]{graphics/figures/fig2.jpg}
 	\begin{tiny}
 		\caption{\small Figure for \texttt{nursery}.\label{img:nursery}}
 	\end{tiny}
+\end{figure}
 
+\begin{figure}[htbp]
+	\centering
 	\includegraphics[width=0.5\textwidth]{graphics/figures/fig3.jpg}
 	\begin{tiny}
 		\caption{\small Figure for \texttt{scene}.\label{img:scene}}
@@ -369,11 +386,11 @@ GENERAL TEXT BLAH BLAH BLAH
 
 
 \section{Conclusions}
-To sum up, using designed and tested by us classifier can not harm the classification what was shown in \textbf{Section~\ref{results}}
+To sum up, using designed and tested by us classifier can not harm the classification what was shown in \textbf{Section~\ref{sec:results}}
 % \section{More complex solution} \lipsum[1]
 
 
-
+\clearpage
 \newpage
 \section*{Appendix: A--- Code design\label{ap:code}}
 % include morkdown README.md
