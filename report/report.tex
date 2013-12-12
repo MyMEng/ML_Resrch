@@ -286,7 +286,9 @@ Number of instances appended to training set during first boosting round seems v
 
 
 \section{Results~\cite{results}}
-This section will be divided into subsections each corresponding to experiment involving given percentage of initial training set size. Further discussion comparing each of the data sets and taken approach will be included in order depending on outcomes of particular experiment.
+This section will be divided into subsections each corresponding to experiment involving given percentage of initial training set size. Further discussion comparing each of the data sets and taken approach will be included in order depending on outcomes of particular experiment.\\
+
+The experiments with \texttt{scene} data set are only conducted with $0.25\%$ sample size and are presented in \textbf{Section~\ref{sec:025}}. This decision is due to focus put on very small training sets.
 
 \subsubsection{Remark: How to read figures.}
 In the following three figures: \textbf{\ref{img:25pc}}, \textbf{\ref{img:10pc}} and \textbf{\ref{img:025pc}} percentage of correctly classified instances is shown on y-axis. x-axis ranging from $1$ to $9$ is experiment number.\\
@@ -295,49 +297,54 @@ In the following three figures: \textbf{\ref{img:25pc}}, \textbf{\ref{img:10pc}}
 Solid \texttt{line} is ``upper bound'' that resulted in training classifier on whole data set. \texttt{\textbf{+}} indicate outcome of semi-supervised learning; finally, \texttt{\textbf{o}} points result of supervised learning on initial sample of training set.
 
 \subsection{$\mathbf{25\%}$ sample~\cite{results25}}
-We will first discuss results with initial sample of size $25\%$ of original training set. The input and output for each of given results are provided together with this report
-
+We will first discuss results with initial sample of size $25\%$ of original training set. The input and output for each of given results are provided together with this report (see references in headers).
 \begin{figure}[htbp]
 \centering
   \includegraphics[width=0.5\textwidth]{graphics/figures/Pfig1.jpg}
 \begin{tiny}
-\caption{\small Figure for $25\%$.\label{img:25pc}}
+\caption{\small Figure for $25\%$ sample of volume of initial training set.\label{img:25pc}}
 \end{tiny}
 \end{figure}
 
+\subsubsection{\texttt{mushrooms}--- \texttt{red}}
+Analysis of the outcomes in \emph{Figure~\ref{img:25pc}} gives that performance of semi-supervised algorithm is negligibly better than the one of supervised learning trained on initial sample. Moreover, both these results are not worse than 1\% in comparison with the outcome of supervised classifier trained on the whole set.
 
-\subsubsection{\texttt{mushrooms}}
-\subsubsection{\texttt{nursery}}
-\subsubsection{\texttt{scene}}
+\subsubsection{\texttt{nursery}--- \texttt{green}}
+In this case semi-supervised learning performs not more than 3\% better than supervised one trained on the same initial sample. We can safely assume that similarly to above example the difference is not significant while considering needed resources.
 
+\subsection*{}
+Generally, with training set of this size we concluded that performing semi-supervised learning is not worth the time and computational power it takes in comparison with possible accuracy gain. This conclusion is based on outcomes for both data sets as loose in performance do not exceed 3\% while comparing supervised and semi-supervised learning with exactly the same initial training set supplied.
 
 \subsection{$\mathbf{10\%}$ sample~\cite{results10}}
+The following figure shows the results of experiment conducted on initial sample of $10\%$ of .
 
 \begin{figure}[htbp]
 \centering
   \includegraphics[width=0.5\textwidth]{graphics/figures/Pfig2.jpg}
 \begin{tiny}
-\caption{\small Figure for $10\%$.\label{img:10pc}}
+\caption{\small Figure for $10\%$ sample of volume of initial training set.\label{img:10pc}}
 \end{tiny}
 \end{figure}
 
-\subsubsection{\texttt{mushrooms}}
-\subsubsection{\texttt{nursery}}
-\subsubsection{\texttt{scene}}
+\subsubsection{\texttt{mushrooms}--- \texttt{red}}
+\subsubsection{\texttt{nursery}--- \texttt{green}}
+\subsection*{}
 
-\subsection{$\mathbf{0.25\%}$ sample~\cite{results025}}
+
+
+\subsection{$\mathbf{0.25\%}$ sample~\cite{results025}\label{sec:025}}
 
 \begin{figure}[htbp]
 \centering
   \includegraphics[width=0.5\textwidth]{graphics/figures/Pfig3.jpg}
 \begin{tiny}
-\caption{\small Figure for $0.25\%$.\label{img:025pc}}
+\caption{\small Figure for $0.25\%$ sample of volume of initial training set.\label{img:025pc}}
 \end{tiny}
 \end{figure}
 
-\subsubsection{\texttt{mushrooms}}
-\subsubsection{\texttt{nursery}}
-\subsubsection{\texttt{scene}}
+\subsubsection{\texttt{mushrooms}--- \texttt{red}}
+\subsubsection{\texttt{nursery}--- \texttt{green}}
+\subsubsection{\texttt{scene}--- \texttt{blue}}
 
 
 GENERAL TEXT BLAH BLAH BLAH
@@ -362,8 +369,7 @@ GENERAL TEXT BLAH BLAH BLAH
 
 
 \section{Conclusions}
-\lipsum[1-3]
-
+To sum up, using designed and tested by us classifier can not harm the classification what was shown in \textbf{Section~\ref{results}}
 % \section{More complex solution} \lipsum[1]
 
 
