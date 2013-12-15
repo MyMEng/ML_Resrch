@@ -334,7 +334,8 @@ In this case semi-supervised learning performs not more than 3\% better than sup
 \subsection*{}
 While comparing three taken approaches there is not much difference visible. All of them behave comparably well on sample training size of 0.25 of initial set.\\
 
-Generally, with training set of this size we concluded that performing semi-supervised learning is not worth the time and computational power it takes in comparison with possible accuracy gain. This conclusion is based on outcomes for both data sets as loose in performance do not exceed 3\% while comparing supervised and semi-supervised learning with exactly the same initial training set supplied.
+Generally, with training set of this size we concluded that performing semi-supervised learning is not worth the time and computational power it takes in comparison with possible accuracy gain. This conclusion is based on outcomes for both data sets as loose in performance do not exceed 3\% while comparing supervised and semi-supervised learning with exactly the same initial training set supplied.\\
+In all cases the correct predictions ratio exceeds 88\% what seems quite a good result.
 
 \subsection{$\mathbf{10\%}$ sample~\cite{results10}\label{sec:results10}}
 The following figure shows the results of experiment conducted on initial sample of $10\%$ of the training set. The overall outcomes are similar to one presented in \textbf{Section~\ref{sec:results25}}. Nonetheless, we can see minor decrease in performance probably due to more than 2 times smaller training set.
@@ -348,19 +349,20 @@ The following figure shows the results of experiment conducted on initial sample
 \end{figure}
 
 \subsubsection{\texttt{mushrooms}--- \texttt{red}}
-The performance of semi supervised learning on this data set is generally better than outcomes of supervised learning on initial training set. Nonetheless, the difference in accuracy does not exceed 1\% what once again indicates that expensive semi-supervised classification may not be worth the possible gain in number of correct prediction.
+The performance of semi-supervised learning on this data set is generally better than outcomes of supervised learning on initial training set. Nonetheless, the difference in accuracy does not exceed 1\% what once again indicates that expensive semi-supervised classification may not be worth the possible gain in number of correct prediction.
 
 \subsubsection{\texttt{nursery}--- \texttt{green}}
-Here, outcomes follow similar pattern as in example above. Performance of semi-supervised algorithm is persistently better than what can be achieved using supervised learning on initial training sample. The difference in accuracy based on provided outcomes is not more than 3\% what leads to conclusion that also in case of 10\% sample it might be not worth to use proposed semi-supervised algorithm.
+Here, outcomes follow similar pattern to the one observed in the example above. Performance of semi-supervised algorithm is persistently better than what can be achieved using supervised learning on initial training sample. The difference in accuracy based on provided outcomes is not more than 3\% what leads to conclusion that also in case of 10\% sample it might not be worth to use proposed semi-supervised algorithm.
 
 \subsection*{}
 While comparing the results with regard to used approaches we can clearly see that \texttt{maximum exploitation} ($x \in \left \{ 1, 2, 3 \right \}$) and \texttt{no exploration} ($x \in \left \{ 4, 5, 6 \right \}$) perform better than \texttt{maximum exploration} ($x \in \left \{ 7, 8, 9 \right \}$). In the later one we can see that the results are approximately the same for supervised method trained on initial sample and for semi-supervised algorithm. This observation same as considered complexity of the method leads to conclusion that using the last approach is not worth needed resources.\\
 
-All in all, for 10\% sampling on training set we arrive at similar conclusion that was made in \textbf{Section~\ref{sec:results25}}. Semi-supervised learning gives little improvement over supervised learning algorithm trained on initial sample. Once again possible gain in accuracy, which does not exceed 3\% may not be worth complicated classification procedure.
+All in all, for 10\% sampling on training set we arrive at similar conclusion that was made in \textbf{Section~\ref{sec:results25}}. Semi-supervised learning gives little improvement over supervised learning algorithm trained on initial sample. Once again possible gain in accuracy, which does not exceed 3\% may not be worth complicated classification procedures.\\
+Also here the correct predictions ratio does not drop below 86\% what seems reasonably good outcome.
 
 
 \subsection{$\mathbf{0.25\%}$ sample~\cite{results025}\label{sec:results025}}
-For 0.25\% sampling of initial training set we arrive at \emph{Figure~\ref{img:025pc}} presented below. In this case the training set contains around 10 instances whereas full set has about 4000 exemplars. With such a small training set we can spot advantages of proposed algorithm over supervised learning on initial training set. The gap in accuracy between semi-supervised and supervised algorithm trained on initial sample increased to maximum of 15\%. The later result gives possibility of improving classification process by using proposed here algorithm in cases where only small amount of labeled data is available.
+For 0.25\% sampling of initial training set we arrive at \emph{Figure~\ref{img:025pc}} presented below. In this case the training set contains around 10 instances whereas full set has above 4000 exemplars. With such a small training set we can spot advantages of proposed algorithm over supervised learning on initial training set. The gap in accuracy between semi-supervised and supervised algorithm trained on initial sample increased to maximum of 15\%. The later result gives possibility of improving classification process by using proposed here algorithm in cases where only a very small amount of labeled data is available.
 
 \begin{figure}[htbp]
 \centering
@@ -374,15 +376,17 @@ For 0.25\% sampling of initial training set we arrive at \emph{Figure~\ref{img:0
 The experiments on this data set prove increase in accuracy while using semi-supervised learning. First two approaches ($x \in \left \{ 1, 2, 3 ,4, 5, 6 \right \}$) perform significantly better (15\% on average) than the last one. Moreover, number of correct prediction is only 7\% less in semi-supervised learning than in supervised one trained on whole set.
 
 \subsubsection{\texttt{nursery}--- \texttt{green}}
-Improvement in semi-supervised learning seems to be consistent through all experiments being on average 10\% in terms of number of correct prediction. Even though the results seems to be advantageous for semi-supervised learning the best achieved accuracy is about 20\% worse than the one achieved with supervised learning trained on whole set.
+Improvement in semi-supervised learning seems to be consistent through all experiments being on average 10\% in terms of number of correct prediction. Even though the results seem to be advantageous for semi-supervised learning the best achieved accuracy is about 20\% worse than the one achieved with supervised learning trained on whole set.
 
 \subsubsection{\texttt{scene}--- \texttt{blue}}
-Designed algorithm seems to give only little improvement on multi-labeled data sets. Here, the increase in accuracy does not exceed 5\%. Moreover, the results of semi-supervised learning are on average 5\% worse than . This result seems interesting and needs further investigation as either treating labels independently or having unbalanced class distribution have detrimental effect on designed algorithm.
+Designed algorithm seems to give only little improvement on multi-labeled data sets. Here, the increase in accuracy does not exceed 5\%. Moreover, the results of semi-supervised learning are on average 10\% worse than number of correct predictions achieved with classifier trained on whole data set. This result seems interesting and needs further investigation as either treating labels independently or having unbalanced class distribution have detrimental effect on designed algorithm in comparison with other used data sets.
 
 \subsection*{}
-blah for approaches//
+Once again we can spot the advantage of first two proposed approaches ($x \in \left [ 1,6   \right ] $) over the third one. Moreover, first one seems to perform slightly better than the other. We can conclude that boosting training set with very small data samples is detrimental to designed algorithm and the focus should be put on first two approaches. This effect can be easily seen within \texttt{mushrooms} data set and it also has slight effect on \texttt{scene} but is not present in \texttt{nursery}. This observation results in conclusion that the last approach is not consistent throughout data set and should be neglected in further discussions.\\
 
-blah for general
+In two previous experiments with initial training size of 25\% and 10\% volume we could state without any doubts that achieved improvement while using semi-supervised learning is not worth its effort. On contrary, here the improvement is significant and both approaches used are relatively simple.\\
+In \texttt{mushrooms} and \texttt{scene} data set the performance is about 7\% worse than the one achieved with full training set. In \texttt{nursery} this value oscillates around 20\%.\\
+To sum up, the improvement with semi-supervised learning reaches 15\% while in general the worse performance of proposed algorithm does not drop below 60\%.
 
 
 
@@ -397,7 +401,7 @@ Magenta solid line represents the total number of exemplars. Blue solid line is 
 		\caption{\small \texttt{mushrooms} data set.\label{img:mushrooms}}
 	\end{tiny}
 \end{figure}
-\texttt{mushrooms} data set with single  will be described first. For both 25\% and 10\% sample the results are very similar and the difference seems not important with regard to proposed semi-supervised algorithm. Classification on 0.25\% sample seems consistent through approaches and gives significant improvement with described algorithm. With regard to this set we can claim that desired improvement has been achieved.\\
+\texttt{mushrooms} (\emph{Figure~\ref{img:mushrooms}}) data set will be considered first. For both 25\% and 10\% sample the results are very similar and the difference does not seem important with regard to proposed semi-supervised algorithm. Classification on 0.25\% sample seems consistent and effective through first two approaches and gives significant improvement with described algorithm while with third approach it seems to fail. With regard to this set we can claim that desired goal has been achieved.\\
 
 
 \begin{figure}[htbp]
@@ -408,7 +412,7 @@ Magenta solid line represents the total number of exemplars. Blue solid line is 
 	\end{tiny}
 \end{figure}
 
-\texttt{nursery}
+\texttt{nursery} (\emph{Figure~\ref{img:nursery}}) gives consistent results for all approaches. For samples of size 25\% and 10\% the number of correct predictions is relatively high for both semi-supervised learning and supervised learning on initial sample what leads to conclusion that first one is not worth performing same as in \texttt{mushrooms}. On contrary, in 0.25\% sample we get very good improvement while using designed algorithm.\\
 
 \begin{figure}[htbp]
 	\centering
@@ -417,6 +421,8 @@ Magenta solid line represents the total number of exemplars. Blue solid line is 
 		\caption{\small \texttt{scene} data set.\label{img:scene}}
 	\end{tiny}
 \end{figure}
+
+Third one--- \texttt{scene} (\emph{Figure~\ref{img:scene}}) which represents multi-label data set is not much of a help in our experiment. Achieved improvement in semi-supervised learning seems relatively low in comparison with two other datasets. Nonetheless, the results of this trial confirm the general conclusions that \emph{first approach}--- \texttt{maximum exploitation} is the best one proposed giving highest overall improvement in semi-supervised learning over supervised learning trained on initial sample.\\
 
 
 \section{Conclusions}
