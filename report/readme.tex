@@ -74,7 +74,7 @@ The format of `xml' file is described as follows:
 
 \begin{spverbatim}
 x labels have(has) been found. Is it Correct?
-\mabox{To confirm type 'y' or if the number is incorrect please give true number of labels:}
+To confirm type 'y' or if the number is incorrect please give true number of labels:
 
 \end{spverbatim}
 
@@ -96,6 +96,10 @@ How many out of 120 instances do you want to use to boost classifier?
 If you want to stop boosting operation and check accuracy of classifier put letter [s]: 
 \end{spverbatim}
 
+\item \texttt{[A]} for priority given to $4/4$ group; \texttt{[B]} for priority given to $3/4$ group; \texttt{[C]} for priority given to $2/4$ group.
+
+\texttt{Give priority to [A]:4/4 | [B]: 3/4 | [C]: 2/4 ?: }
+
 \item \texttt{integer} representing number of trials to perform on each of classifier with whole training set or cross-validation rounds if no test set provided. 
 
 \texttt{How many times do you want to perform tests with c-v of supervised learning?:}
@@ -113,6 +117,13 @@ Confusion matrix over 2 repetitions for SUPERVISED learning:
 
     150 354
 
+Confusion matrix over 2 repetitions for SUPERVISED learning for initial semi-sup set:
+
+
+    322 294
+
+    134  370
+
 Confusion matrix for SEMI-SUPERVISED learning (each value multiplied  by number of repetitions):
 
     288 328
@@ -120,6 +131,7 @@ Confusion matrix for SEMI-SUPERVISED learning (each value multiplied  by number 
     88  416
 
 863 instances out of 1120 instances were predicted correctly in SUPERVISED learning.
+692 instances out of 1120 instances were predicted correctly in SUPERVISED learning with initial semi-sup set.
 704 instances out of 1120 instances were predicted correctly in SEMI-SUPERVISED learning.
 \end{spverbatim}
 
@@ -127,6 +139,6 @@ Confusion matrix for SEMI-SUPERVISED learning (each value multiplied  by number 
 
 \section*{The Experiment}
 
-To this end, the script uses 4 implemented in \texttt{WEKA} classifiers: \texttt{IBk}, \texttt{J48}, \texttt{SMO} with \texttt{Polynomial Kernel} and \texttt{SMO} with \texttt{RBF Kernel}. It the trains all of them on randomly chosen sample of data instances and predicts class and all the other instances of given \emph{train} file. Then it shows statistics of classification and allows user to define number of instances to enrich train set with ground truth for them assigned as predicted class(majority class of 4 predictions for each classifier). This classifier reinforcing process is repeated until there is no instances form train set left or user aborts training procedure. Finally the performance of classifier is evaluated on external test set or if there is no such on whole data set supplied for training and statistics are displayed.
+To this end, the script uses 4 implemented in \texttt{WEKA} classifiers: \texttt{IBk}, \texttt{J48}, \texttt{SMO} with \texttt{Polynomial Kernel} and \texttt{SMO} with \texttt{RBF Kernel}. It trains all of them on randomly chosen sample of data instances and predicts class for all the other instances of given \emph{training} data set. Then it shows statistics of classification and allows user to define number of instances to enrich training set with ground truth appended to them given as predicted class (majority class of 4 predictions given by classifier). This classifier reinforcing process is repeated until there is no instances left form training set or user aborts boosting procedure. Finally the performance of classifier is evaluated on external test set or if there is no such on whole data set supplied for training and statistics are displayed.
 
 Detailed description of the results is contained in \emph{The Experiment} section of the report which is also included in this repository as: \texttt{report\slash report.pdf}.

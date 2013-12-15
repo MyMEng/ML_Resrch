@@ -373,18 +373,18 @@ For 0.25\% sampling of initial training set we arrive at \emph{Figure~\ref{img:0
 \end{figure}
 
 \subsubsection{\texttt{mushrooms}--- \texttt{red}}
-The experiments on this data set prove increase in accuracy while using semi-supervised learning. First two approaches ($x \in \left \{ 1, 2, 3 ,4, 5, 6 \right \}$) perform significantly better (15\% on average) than the last one. Moreover, number of correct prediction is only 7\% less in semi-supervised learning than in supervised one trained on whole set.
+The experiments on this data set prove increase in accuracy while using semi-supervised learning. First two approaches ($x \in \left \{ 1, 2, 3 ,4, 5, 6 \right \}$) perform significantly better (15\% on average) than the last one. Moreover, number of correct predictions is only 7\% less in semi-supervised learning than in supervised one trained on whole set.
 
 \subsubsection{\texttt{nursery}--- \texttt{green}}
-Improvement in semi-supervised learning seems to be consistent through all experiments being on average 10\% in terms of number of correct prediction. Even though the results seem to be advantageous for semi-supervised learning the best achieved accuracy is about 20\% worse than the one achieved with supervised learning trained on whole set.
+Improvement in semi-supervised learning seems to be consistent through all experiments being on average 10\% better in terms of number of correct prediction. Even though the results seem to be advantageous for semi-supervised learning the best achieved accuracy is about 20\% worse than the one achieved with supervised learning trained on whole set.
 
 \subsubsection{\texttt{scene}--- \texttt{blue}}
 Designed algorithm seems to give only little improvement on multi-labeled data sets. Here, the increase in accuracy does not exceed 5\%. Moreover, the results of semi-supervised learning are on average 10\% worse than number of correct predictions achieved with classifier trained on whole data set. This result seems interesting and needs further investigation as either treating labels independently or having unbalanced class distribution have detrimental effect on designed algorithm in comparison with other used data sets.
 
 \subsection*{}
-Once again we can spot the advantage of first two proposed approaches ($x \in \left [ 1,6   \right ] $) over the third one. Moreover, first one seems to perform slightly better than the other. We can conclude that boosting training set with very small data samples is detrimental to designed algorithm and the focus should be put on first two approaches. This effect can be easily seen within \texttt{mushrooms} data set and it also has slight effect on \texttt{scene} but is not present in \texttt{nursery}. This observation results in conclusion that the last approach is not consistent throughout data set and should be neglected in further discussions.\\
+Once again we can spot the advantage of first two proposed approaches ($x \in \left [ 1,6   \right ] $) over the third one. Moreover, first one seems to perform slightly better than the other. We can conclude that boosting training set with very small data samples is detrimental to designed algorithm and the focus should be put on first two approaches. This effect can be easily seen within \texttt{mushrooms} data set and it also has slight effect on \texttt{scene} but is not present in \texttt{nursery}. This observation results in conclusion that the last approach is not consistent throughout data sets and should be neglected in further discussions.\\
 
-In two previous experiments with initial training size of 25\% and 10\% volume we could state without any doubts that achieved improvement while using semi-supervised learning is not worth its effort. On contrary, here the improvement is significant and both approaches used are relatively simple.\\
+In two previous experiments with initial training size of 25\% and 10\% volume we could state without any doubts that achieved improvement while using semi-supervised learning is not worth its effort. On contrary, here the improvement is significant simultaneously with both used approaches being relatively simple.\\
 In \texttt{mushrooms} and \texttt{scene} data set the performance is about 7\% worse than the one achieved with full training set. In \texttt{nursery} this value oscillates around 20\%.\\
 To sum up, the improvement with semi-supervised learning reaches 15\% while in general the worse performance of proposed algorithm does not drop below 60\%.
 
@@ -426,8 +426,11 @@ Third one--- \texttt{scene} (\emph{Figure~\ref{img:scene}}) which represents mul
 
 
 \section{Conclusions}
-To sum up, using designed and tested by us classifier can not harm the classification what was shown in \textbf{Section~\ref{sec:results}}.
-First two approaches seems stabel and give overall improvement in all data sets while the last one does not always  give better accuracy.
+To sum up, designed and tested by us classifier can not harm the number of correctly classified instances what was shown in \textbf{Section~\ref{sec:results}}. The best out of all proposed approaches is the first one--- \texttt{maximum exploitation} based on conducted experiments. Generally, first two approaches seems stable and give overall improvement in all data sets while the last one does not always give better accuracy.\\
+
+While considering training set size we have shown that with rather big  ones performing semi-supervised learning does not give improvement that is worth resources needed for such algorithm. On contrary, in cases where training set contains only a few labeled exemplars we have shown significant improvement in number of correctly classified instances what proves that our algorithm is efficient and what is more--- simple.\\
+
+Unfortunately, designed algorithm does not achieve expected results while classifying multi-label datasets what might be caused by either treating labels independently or some labels being not uniformly distributed. This issue needs further investigation to extend functionality over this type of classification problems. We hope to address this problem in our next work.\\
 % \section{More complex solution} \lipsum[1]
 
 
