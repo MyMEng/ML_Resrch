@@ -95,7 +95,7 @@ Keywords: \textbf{semi-supervised learning, methodology review, self-training, a
 
 \begin{chapabstract}
 % Add some chapter abstract so this two chapters can be easily separated to form to papers.
-In this part we would like to introduce the basic concepts of semi-supervised learning, briefly discuss basic assumption that drives SSL (Semi-Supervised Learning) models such as smoothness or cluster assumption. We would like to present three major categories of algorithms used in SSL: generative models, low density separation and graph based methods. Finally, we want to give an account for real life applications of SSL methods and tell where they are useful and successful.
+In this part we would like to introduce the basic concepts of semi-supervised learning, briefly discuss basic assumptions that rule SSL (Semi-Supervised Learning) such as smoothness or cluster assumption. We would like to present three major categories of models and classification algorithms used in SSL: generative models, low density separation and graph based methods. Finally, we want to give an account for real life applications of SSL methods and tell where they are useful and successful.
 \end{chapabstract}
 
 
@@ -104,14 +104,14 @@ Usually students taking a machine learning course would be familiar with two mai
 
 The latter approach, \textit{unsupervised learning}, does not use a labeled set of instances for training purposes or any other \emph{a priori} knowledge about the data. A common task of this method is \textit{clustering}. We try to "predict" classes our data using a variety of methods and assign unlabeled instances into correct clusters.
 
-However, in real life we more often find examples of data which is not labeled and manual labeling requires significant amount of labor hence, it is expensive\cite{Blum98, He07}. If we use classical algorithms involving training, we may not achieve very good results due to limited number of training instances. On the other hand, if we use a clustering method, then we do not take any advantage of having already labeled instances.
+However, in real life we more often find examples of data which is not labeled and manual labeling requires significant amount of labour, hence it may be very expensive or not practical to label data manually\cite{Blum98, He07}. If we use classical algorithms involving training, we may not achieve very good results due to limited number of training instances. On the other hand, if we use a clustering method, then we do not take any advantage of having already labeled instances.
 
 \textit{Semi-supervised learning}, is in fact a missing link between these two approaches. Having a limited training set we aim to accurately predict correct classes for unseen data. In this work we would like to explain in details what semi-supervised methods are, present different approaches and finally compare them with other available techniques by providing examples of application.
 
 \section{Definition of semi-supervised learning}
 In this work we would like to focus on one particular task of SSL, which builds on top of classical supervised classification task. There are also other settings, such as semi-supervised clustering or dimensionality reductions which are covered in depth by works from other authors.
 
-In semi-supervised classification we aim to find a function $ f $ that will predict classes of unlabeled data with better accuracy than supervised technique using only a very small training set. We extend training set $ X $ so that it contains both kinds of data. In other words, $ X = L \cup U $, where $ L $ is a set of $ n $ instances (denoted by $ x $) with corresponding labels (denoted by $ y $): $ L = \{ (x_1, y_1), (x_2, y_2), ..., (x_n, y_n)\} $ and $ U $ is the set of $ m $ unlabeled data points: $ U = \{ x_{n+1}, x_{n+2}, ..., x_{n+m}\} $. Also, let's call set of $n$ labels or classes only: $ Y = \{ y_1, y_2, ..., y_n \} $
+In semi-supervised classification we aim to find a function $ f $ that will predict classes of unlabeled data with better accuracy than supervised technique using only a very small training set. We extend training set $ X $ so that it contains both kinds of data. In other words, $ X = L \cup U $, where $ L $ is a set of $ n $ instances (denoted by $ x $) with corresponding labels (denoted by $ y $): $ L = \{ (x_1, y_1), (x_2, y_2), ..., (x_n, y_n)\} $ and $ U $ is the set of $ m $ unlabeled data points: $ U = \{ x_{n+1}, x_{n+2}, ..., x_{n+m}\} $. Also, let's call set of $l$ labels or classes only: $ Y = \{ y_1, y_2, ..., y_l \} $
 
 In sections below we would like to define certain assumptions of semi-supervised learning.
 
@@ -184,7 +184,7 @@ The idea behind TVM is very intuitive: we first have to find a decision boundary
 
 One more category of classification methods in semi-supervised learning uses graph representation of the data. In graph based methods of semi-supervised learning, in order to classify the data we create an undirected graph $ G = (V, E) $. The set of nodes $ V $ contains both labeled and unlabeled instances. Edges of the graph, the set $ E $, is representing similarity between two connecting nodes, which can be expressed as weight $ w_{ij} $ between two vertices $x_{i} \text{ and } x_{j} $. Learning using graph methods involves assigning labels $ y $ to each node of the graph by examining the weights. Thanks to the smoothness assumption we might assume that if weight $ w_{ij} $ is large, then two labels $ y_i \text{ and } y_j $ will be the same. Since we have provided small training data, there are nodes already having labels assigned, therefore we are able to classify all nodes in the graph\cite{Zhu06semi}.
 
-Many of the methods for building graphs and estimating weights are distance based, such as fully connected graph, kNN and $\epsilon$NN graphs\cite{Zhu06semi}. In fully connected graph we create edges between all pairs of vertices and we assign weights that are inversely proportional to the Euclidean distance between the nodes. Missing edge would represent an infinite weight\cite{chapelle06}. In kNN case, we only connect k nearest neighbors. $\epsilon$NN takes into account only pairs vertices $ x_i \text{ and } x_j $ with distance $ \| x_i - x_j \| < \epsilon $.\\[1cm]
+Many of the methods for building graphs and estimating weights are distance based, such as fully connected graph, kNN and $\epsilon$NN graphs\cite{Zhu06semi}. In fully connected graph we create edges between all pairs of vertices and we assign weights that are inversely proportional to the Euclidean distance between the nodes. Missing edge would represent an infinite weight\cite{chapelle06}. In kNN case, we only connect k nearest neighbors. $\epsilon$NN takes into account only pairs vertices $ x_i \text{ and } x_j $ with distance $ \| x_i - x_j \| < \epsilon $ for some $\epsilon > 0$.\\[1cm]
 
 \begin{figure}[htbp]
 \centering
@@ -195,7 +195,7 @@ Many of the methods for building graphs and estimating weights are distance base
 \vspace{1cm}
 \end{figure}
 
-In \emph{Figure~\ref{fig:GraphMethodFig}} we can see a very simplified example in which only two instances $x_1$ and $x_2$ were labeled--- nodes were constructed between nearest neighbors and we can classify those unlabeled by following paths from the labeled data points.
+In \emph{Figure~\ref{fig:GraphMethodFig}} we can see a very simplified example in which only two instances $x_1$ and $x_2$ were labeled -- nodes were constructed between nearest neighbors and we can classify those unlabeled by following paths from the labeled data points.
 
 In contrast to distance based methods of building graphs, there are also proposed generative approaches that are claimed to be more effective for certain datasets than methods using discriminative approach\cite{He07}. Rather than calculating Euclidean distance, we estimate conditional probabilities of classes given data points and set them as weights between nodes.
 
@@ -217,12 +217,12 @@ For experimental part of this assignment we decided to build a simple \emph{self
 \end{chapabstract}
 
 \section{Background}
-As described, the motivation of this project is wide demand for machine learning algorithms which would perform comparably good to supervised learning approaches but require only small fraction of labeled data used with nowadays solutions. The goal of building elementary semi-supervised algorithm is to check whether with simplistic approach we can achieve correct prediction ratio close to the one of some more complex approaches listed in \textbf{Chapter~\ref{ch:sstheory}}. 
+As described, the motivation of this project is wide demand for machine learning algorithms which would perform comparably good to supervised learning approaches and to require only small fraction of labeled data used in nowadays solutions. The goal of building elementary semi-supervised algorithm is to check whether with simplistic approach we can achieve correct prediction ratio close to the one of some more complex approaches listed in \textbf{Chapter~\ref{ch:sstheory}}. 
 %Finally we will propose solution that uses cutting-edge mathematical result which base on \emph{Thompson Sampling} together with \emph{Multi-armed Bandit Theory}.
 % Despite the demand in environments where labeling the data is expensive .
 
 \section{Introduction}
-Our approach is based on four supervised learning algorithm. We assume that it is more probable that predicted class agrees with ground truth for particular instances if 4 different classifiers agree on predicted label. Following this lead, we compare mentioned statistics of instances and use data points with appended predicted labels to rebuild training set. For comprehensive view multiple sets and approaches are used. In literature such solution is called \emph{self-training algorithm} and number of classifiers that agree on prediction can be considered as \emph{confidence measure}~\cite{zhu2009introduction}. Such algorithms are known to be good in natural language processing but we need to bear in mind that potential error made on predicted label can reinforce itself. We chose this approach as it is the most general one and does not assume any particular distribution within the data. \emph{Self-training} belongs to \emph{wrapper} methods family as it can be used with any approach that measures how good the prediction of unlabeled data is probable to overlap with ground truth.
+Our approach is based on four supervised learning algorithm. We assume that it is more probable that predicted class agrees with ground truth for particular instances if 4 different classifiers agree on predicted label. Following this assumption, we compare mentioned statistics of instances and use data points with appended predicted labels to rebuild training set. In order to provide a more comprehensive overview, multiple sets and approaches are tested. In literature such solution is called \emph{self-training algorithm} and number of classifiers that agree on prediction can be considered as \emph{confidence measure}~\cite{zhu2009introduction}. Such algorithms are known to be good in natural language processing but we need to bear in mind that potential error made on predicted label can reinforce itself. We chose this approach as it is the most general one and does not assume any particular distribution within the data. \emph{Self-training} belongs to \emph{wrapper} methods family as it can be used with any approach that measures how good the prediction of unlabeled data is probable to overlap with ground truth.
 
 \section{Experiment design}
 % \subsection{General approach}
@@ -247,6 +247,7 @@ The next step is boosting procedure. To this end, the remaining unlabeled instan
 \textbf{None ($1/4$)} & All classifiers predicted different label. One label is chosen at random.\\[0.4cm]
 \end{tabular}
 
+% ??????????????????? instances are predicted using re-trained on just expanded set?? needs rephrasing
 While running the experiment it is possible to decide how many instances from the above categories should be used for boosting procedure. Selected exemplars are labeled based on listed above rules and appended to training set. Then, the remaining unlabeled instances are predicted using re-trained on just expanded set classifiers and grouped again. This process is repeated until person running the experiment decides to stop boosting procedure.\\
 
 Final step is to indicate whether testing will be performed on external test set or on already supplied training set. 
@@ -287,8 +288,8 @@ Data sets that were used are listed below and respectively match categories give
 \subsection{Approaches to the experiment\label{sec:experimetnapproach}}
 To compare performance of designed semi-supervised algorithm we will consider a few approaches and test them on all chosen data sets.\\
 It is possible that initial selection of training instances for semi-supervised learning will be very unlucky and consists only of instances with the same label due to random sampling. 
-In real-life such situation is not a thread as instances are carefully selected by scientists to be uniformly distributed. 
-In our approach the simplest solution to avoid such ``bad luck'' and make sure that supplied exemplars in training set have diverse class distribution could be repeating random training set initialization until instances are ``almost'' uniformly distributed according to their ground truth. Other approach could be to check whether initial training set is diverse and if not sample instances from unlabeled pool asking user (with our design not needed as ground truth is available) for the label until ``sufficient'' diversity is achieved.\\
+In real-life such situation would become an issue since instances ought to be carefully selected to be uniformly distributed.
+In our approach the simplest solution to avoid such ``bad luck'' and make sure that supplied exemplars in training set have diverse class distribution could be repeating random training set initialization until instances are ``almost'' uniformly distributed according to their ground truth. Other approach could be to check whether initial training set is diverse and if this would not be the case, sample instances from unlabeled pool asking user (with our design not needed as ground truth is available) for the label until ``sufficient'' diversity is achieved.\\
 
 Assuming that we have resolved problem of distribution in initial training set the next stage is to describe taken approaches:
 \begin{enumerate}
@@ -299,12 +300,12 @@ Assuming that we have resolved problem of distribution in initial training set t
 Above experiments are conducted with number of instances in initial training set containing $0.25\%\text{, } 10\% \text{ and } 25\%$ of whole training set ($U$) volume.
 
 \subsubsection{Remark: Initial step}
-Number of instances appended to training set during first boosting round seems very important. Reasonably the potential error in prediction of labels that could occur will be reinforced during next iterations of boosting procedure. Potential solution could be maximizing the number of instances added in the first round of boosting as we know that their labels were predicted using classifier trained on a set with correct ground truth. The key point here is to find equilibrium in number of exemplars added in first boosting round to avoid reproducing potential error and do not loose possible information gain in next iterations of semi-supervised model (if we use all instances in first round).
+Number of instances appended to training set during first boosting round seems very important. Reasonably the potential error in prediction of labels that could occur will be reinforced during consecutive iterations of boosting procedure. Potential solution could be maximizing the number of instances added in the first round of boosting as we know that their labels were predicted using classifier trained on a set with correct ground truth. The key point here is to find equilibrium in number of exemplars added in first boosting round to avoid reproducing potential error and do not loose possible information gain in next iterations of semi-supervised model (if we use all instances in first round).
 % Give results as snippets on GitHub.
 %  are correct so produced classifier will not have any bias due to incorrect training set
 
 \section{Results~\cite{results} \label{sec:results}}
-This section will be divided into subsections each corresponding to experiment involving given percentage of initial training set size. Further discussion comparing each of the data sets and taken approach will be included in order depending on outcomes of particular experiment.\\
+This section is divided into subsections, each one corresponding to experiment involving given percentage of initial training set size. Further discussion comparing each of the data sets and taken approach will be included in order depending on outcomes of particular experiment.\\
 
 The experiments with \texttt{scene} data set are only conducted with $0.25\%$ sample size and are presented in \textbf{Section~\ref{sec:results025}}. This decision is due to focus put on very small training sets were we can take full advantage of semi-supervised learning.
 
@@ -361,7 +362,7 @@ Also here the correct predictions ratio does not drop below 86\% what seems reas
 
 
 \subsection{$\mathbf{0.25\%}$ sample~\cite{results025}\label{sec:results025}}
-For 0.25\% sampling of initial training set we arrive at \emph{Figure~\ref{img:025pc}} presented below. In this case the training set contains around 10 instances whereas full set has above 4000 exemplars. With such a small training set we can spot advantages of proposed algorithm over supervised learning on initial training set. The gap in accuracy between semi-supervised and supervised algorithm trained on initial sample increased to maximum of 15\%. The later result gives possibility of improving classification process by using proposed here algorithm in cases where only a very small amount of labeled data is available.
+For 0.25\% sampling of initial training set we arrive at \emph{Figure~\ref{img:025pc}} presented below. In this case the training set contains around 10 instances whereas full set has above 4000 exemplars. With such a small training set we can spot advantages of proposed algorithm over supervised learning on initial training set. The gap in accuracy between semi-supervised and supervised algorithm trained on initial sample increased to maximum of 15\%. The later result gives possibility of improving classification process by using an algorithm proposed here in cases where only a very small amount of labeled data is available.
 
 \begin{figure}[htbp]
 \centering
@@ -427,7 +428,7 @@ Third one--- \texttt{scene} (\emph{Figure~\ref{img:scene}}) which represents mul
 \section{Conclusions}
 To sum up, designed and tested by us classifier can not harm the number of correctly classified instances what was shown in \textbf{Section~\ref{sec:results}}. The best out of all proposed approaches is the first one--- \texttt{maximum exploitation} based on conducted experiments. Generally, first two approaches seems stable and give overall improvement in all data sets while the last one does not always give better accuracy.\\
 
-While considering training set size we have shown that with rather big  ones performing semi-supervised learning does not give improvement that is worth resources needed for such algorithm. On contrary, in cases where training set contains only a few labeled exemplars we have shown significant improvement in number of correctly classified instances what proves that our algorithm is efficient and what is more--- simple.\\
+While considering training set size we have shown that, having a relatively big training set, performing semi-supervised learning does not give enough improvement so it could be worth resources needed for such algorithm. On contrary, in cases where training set contains only a few labeled exemplars we have shown significant improvement in number of correctly classified instances what proves that our algorithm is efficient and what is more--- simple.\\
 
 Unfortunately, designed algorithm does not achieve expected results while classifying multi-label datasets what might be caused by either treating labels independently or some labels being not uniformly distributed. This issue needs further investigation to extend functionality over this type of classification problems. We hope to address this problem in our next work.\\
 % \section{More complex solution} \lipsum[1]
