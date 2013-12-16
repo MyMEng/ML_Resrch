@@ -120,8 +120,7 @@ Partially-supervised learning presents two different approaches to learning: ind
 
 Inductive approach involves using a mixture of labeled and unlabeled data to classify an unseen test set of unlabeled instances. In other words we try to find a function: $ f: X_{test} \to Y $ where $ X_{test} $ contains unlabeled points beyond provided training set, i.e. $ X_{test} = \{ x_l, x_{l+1}, ..., x_{k} \} $ where $ k > l > n+m $.
 
-In the latter approach, we focus on classifying data within the training sample. Hence our goal is to classify available unlabeled data deal rather than an external test dataset. Again we can express this as a function: $ f: X_{test} \to Y $, but now $ X_{test} $ contains unlabeled points provided in training set, i.e. $ X_{test} = \{ x_n, x_{n+1}, ..., x_{m} \} $.
-% deal ????????????????????????????????????????????????????????????????????????
+In the latter approach, we focus on classifying data within the training sample. Hence our goal is to classify available unlabeled data rather than an external test dataset. Again we can express this as a function: $ f: X_{test} \to Y $, but now $ X_{test} $ contains unlabeled points provided in training set, i.e. $ X_{test} = \{ x_n, x_{n+1}, ..., x_{m} \} $.
 \subsection{Smoothness assumption}
 
 Semi-supervised learning assumes \emph{smoothness prior} for its inputs and outputs\cite{chapelle06}. For instance, in image processing a general smoothness prior assumes that in a given space output changes in a smooth way over distance or time\cite{stan95}. Similarly in machine learning, labels tend to change smoothly over the space. Under assumptions of semi-supervised learning we extend this generalization to include information about smoothness of inputs. We assume that for two given inputs $ x_1\text{, }x_2 $ the distance between corresponding labels $ l_1, l_2 $ will be smaller if the inputs are in a high density region, but the labels might be separated further away from each other when inputs are placed in lower density cluster.
@@ -129,16 +128,16 @@ Semi-supervised learning assumes \emph{smoothness prior} for its inputs and outp
 \subsection{Cluster assumption}
 \label{sec:clusterassump}
 
-Another assumption we make about the data is that we believe that points tend to form clusters. Furthermore, we assume that if two given points $ x_1\text{, }x_2 $ are geometrically close within the same cluster, they would share the same class\cite{chapelle06}.
-% close ??????????????????????????????????????????????????????????????????????
-This assumption is rather intuitive---  if data of the same class tends to form clusters it is unlikely that a point of a different class will be placed in a ``wrong'' cluster. Although it is still possible, this generalization allows us to look at the structure of unlabeled data points and use observed structure of data in semi-supervised learning algorithms.
+Another assumption we make about the data is that we believe that points tend to form geometrical clusters. Furthermore, we assume that if two given points $ x_1\text{, }x_2 $ are contained within the same cluster, they become more likely to share the same class\cite{chapelle06}.
+
+This assumption is rather intuitive ---  if data of the same class tends to form clusters it is unlikely that a point of a different class will be placed in a ``wrong'' cluster. Although it is still possible, this generalization allows us to look at the structure of unlabeled data points and use observed structure of data in semi-supervised learning algorithms.
 
 \subsection{Manifold assumption}
  
 When performing classification tasks, one of the big issues is data dimensionality. e.g.\ let's imagine we have trained a spam filter that would estimate likelihood of e-mail being spam and ham based on certain keywords. In this example each keyword added to the classifier adds another dimension. 
 
-Having many dimensions is a problem known as \textit{curse of dimensionality}\cite{chapelle06}. Not only data size grows exponentially with features added, but also correlation between features varies hence it becomes harder to find a good classes estimations. The manifold assumption states that high dimensional data lies on a low-dimensional manifold. What means that we may try to reduce number of features used in learning by selecting only uncorrelated features and still maintain good performance of the classifier. 
-% was correlated changed on uncorrelated ???????????????????????
+Having many dimensions in the data may lead to a problem known as \textit{curse of dimensionality}\cite{chapelle06}. Not only data size grows exponentially with features added, but also correlation between features varies hence it becomes harder to find a good class estimations. The manifold assumption states that high dimensional data lies on a low-dimensional manifold. What is means is that we may try to reduce number of features used in learning by selecting only certain features while we can still maintain good performance of the classifier. In order to reduce number of dimensions we use methods of feature extraction and selection, e.g. by minimizing the correlation between features\cite{Hall99}.
+
 \section{Models and methods}
 
 The literature describing SSL presents many different types classification algorithms\cite{chapelle06,Zhu06semi} however we are going to describe only three major categories of them, present some examples and discuss how they relate to the assumptions stated in the previous sections.
@@ -168,7 +167,7 @@ This algorithm, explained in details in \cite{chapelle06}, allows us to find ini
 
 \subsection{Low-density separation}
 
-Given assumptions described in sections above, we know that our instances will be most probably forming high density regions. We may achieve the goal of classification by pushing decision boundary maximally away from unlabeled data points.
+Given assumptions described in sections above, in particular the cluster assumption, we know that our instances will be most probably forming high density regions. We may achieve the goal of classification by pushing decision boundary maximally away from unlabeled data points.
 In order to achieve that we often use a maximum margin algorithm, for instance a modified version of support vector machine (SVM)\cite{chapelle06,Zhu06semi}. In SSL we use Transductive SVM \cite{chapelle06}, also known as Semi Supervised SVM or S3VM \cite{Zhu06semi}.
 The idea behind TVM is very intuitive: we first have to find a decision boundary using only labeled instances. Then we incorporate unlabeled data points into the training to move the boundary away from the points within a certain margin.\\[1cm]
 
