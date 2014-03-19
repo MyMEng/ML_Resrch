@@ -1,5 +1,5 @@
 # **Introduction to Machine Learning- Research Project**
-# **Implementation of simple SEM-SUPERVISED learning**
+# **Implementation of simple SEMI-SUPERVISED learning**
 
 ---
 
